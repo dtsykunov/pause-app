@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Pause</string>
+    <string name="service_label">Pause monitor</string>
+    <string name="service_description">Detects when you open a chosen app and shows a calming pause before you continue.</string>
+
+    <string name="status_enabled">Accessibility access: ON</string>
+    <string name="status_disabled">Accessibility access: OFF — tap to enable</string>
+    <string name="enable_access">Enable accessibility access</string>
+
+    <string name="pause_duration">Pause duration: %1$d s</string>
+    <string name="apps_header">Apps to pause</string>
+    <string name="loading">Loading apps…</string>
+
+    <string name="overlay_opening">Opening %1$s</string>
+    <string name="overlay_attempts_one">You\'ve opened it 1 time in the last 24h</string>
+    <string name="overlay_attempts_many">You\'ve opened it %1$d times in the last 24h</string>
+    <string name="overlay_breathe">Breathe</string>
+    <string name="overlay_open">Open anyway</string>
+    <string name="overlay_close">Not now</string>
+</resources>

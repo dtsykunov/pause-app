@@ -1,0 +1,5 @@
+<resources>
+    <style name="Theme.Pause" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+    </style>
+</resources>

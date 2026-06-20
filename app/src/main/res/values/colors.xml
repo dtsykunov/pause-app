@@ -1,0 +1,6 @@
+<resources>
+    <color name="overlay_bg">#0F1722</color>
+    <color name="overlay_circle">#3D5AFE</color>
+    <color name="overlay_text">#F5F7FA</color>
+    <color name="overlay_text_dim">#9AA7B8</color>
+</resources>

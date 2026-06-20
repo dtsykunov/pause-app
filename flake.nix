@@ -24,7 +24,7 @@
         }).androidsdk;
       in
       pkgs.mkShell {
-        packages = [ pkgs.jdk21 androidSdk ];
+        packages = [ pkgs.jdk21 androidSdk pkgs.gradle ];
 
         ANDROID_HOME = "${androidSdk}/libexec/android-sdk";
         ANDROID_SDK_ROOT = "${androidSdk}/libexec/android-sdk";
