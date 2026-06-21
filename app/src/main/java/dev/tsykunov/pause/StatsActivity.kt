@@ -17,6 +17,8 @@ class StatsActivity : AppCompatActivity() {
         binding = ActivityStatsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.toolbar.setNavigationOnClickListener { finish() }
+
         binding.resetButton.setOnClickListener {
             Prefs.resetStats(this)
             render()
