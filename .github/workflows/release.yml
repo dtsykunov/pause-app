@@ -59,14 +59,19 @@ jobs:
           name: Pause ${{ github.ref_name }}
           generate_release_notes: true
           body: |
-            **Pause** — a calm, open-source mindful pause before you open distracting apps on Android.
+            **Pause** is a free, open-source Android app that adds a short, timed pause before you
+            open distracting apps.
 
-            A breathing screen with a short timed pause and an open count appears when you launch a
-            chosen app, adding gentle friction so you open with intention. No accounts, no tracking,
-            no subscription.
+            When you open an app you've chosen, Pause covers the screen with a short countdown before
+            you can continue, so opening is a deliberate choice. It also shows how many times you've
+            opened that app in the last 24 hours. No account, no tracking, no subscription.
+
+            Many recent Android phones already do this natively (Digital Wellbeing, and Android 17's
+            Pause Point). Pause is for older devices, custom ROMs, and phones without Google's Digital
+            Wellbeing.
 
             **Install:** download `pause-${{ github.ref_name }}.apk` below, open it on your phone, and
             allow installs from unknown sources if prompted. Then grant accessibility access and pick
             the apps to pause.
 
-            Topics: digital wellbeing · screen time · focus · app blocker alternative · mindful phone use
+            Topics: digital wellbeing, screen time, focus, app blocker alternative, intentional phone use
