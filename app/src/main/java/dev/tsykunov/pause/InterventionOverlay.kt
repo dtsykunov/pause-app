@@ -26,6 +26,7 @@ class InterventionOverlay(
     private val attempts: Int,
     private val seconds: Int,
     private val phrase: String,
+    private val showTimer: Boolean,
     private val onOpenAnyway: () -> Unit,
     private val onClose: () -> Unit,
 ) {
@@ -85,6 +86,7 @@ class InterventionOverlay(
             binding.root.context.getString(R.string.overlay_attempts_many, attempts)
         }
         binding.countdownText.text = seconds.toString()
+        binding.countdownText.visibility = if (showTimer) View.VISIBLE else View.GONE
         binding.breatheText.text = phrase
     }
 

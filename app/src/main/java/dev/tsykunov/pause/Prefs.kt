@@ -9,6 +9,7 @@ object Prefs {
     private const val KEY_BLOCKED = "blocked_packages"
     private const val KEY_DURATION = "pause_seconds"
     private const val KEY_PHRASE = "pause_phrase"
+    private const val KEY_SHOW_TIMER = "show_timer"
     private const val KEY_STAT_PKGS = "stat_packages"
     private const val STAT_INTERRUPTIONS = "si_"
     private const val STAT_OPENS = "so_"
@@ -49,6 +50,12 @@ object Prefs {
 
     fun setPhrase(c: Context, phrase: String) {
         sp(c).edit().putString(KEY_PHRASE, phrase).apply()
+    }
+
+    fun showTimer(c: Context): Boolean = sp(c).getBoolean(KEY_SHOW_TIMER, true)
+
+    fun setShowTimer(c: Context, show: Boolean) {
+        sp(c).edit().putBoolean(KEY_SHOW_TIMER, show).apply()
     }
 
     /** Record an open attempt for [pkg] and return the number of attempts in the last 24h. */

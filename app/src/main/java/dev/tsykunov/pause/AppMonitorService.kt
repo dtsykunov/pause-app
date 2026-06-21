@@ -56,16 +56,17 @@ class AppMonitorService : AccessibilityService() {
 
         val attempts = Prefs.recordAttempt(this, active)
         Prefs.incInterruptions(this, active)
-        showOverlay(active, attempts, Prefs.pauseSeconds(this), Prefs.phrase(this))
+        showOverlay(active, attempts, Prefs.pauseSeconds(this), Prefs.phrase(this), Prefs.showTimer(this))
     }
 
-    private fun showOverlay(pkg: String, attempts: Int, seconds: Int, phrase: String) {
+    private fun showOverlay(pkg: String, attempts: Int, seconds: Int, phrase: String, showTimer: Boolean) {
         overlay = InterventionOverlay(
             service = this,
             appLabel = appLabel(pkg),
             attempts = attempts,
             seconds = seconds,
             phrase = phrase,
+            showTimer = showTimer,
             onOpenAnyway = {
                 Prefs.incOpens(this, pkg)
                 allowedUntil[pkg] = System.currentTimeMillis() + graceMs

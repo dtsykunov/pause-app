@@ -13,6 +13,8 @@
     <string name="section_apps">Paused apps</string>
 
     <string name="duration_value">%1$d seconds</string>
+    <string name="show_timer">Show countdown</string>
+    <string name="show_timer_hint">A visible number can make you wait it out</string>
     <string name="phrase_hint">Shown during the pause</string>
     <string name="loading">Loading apps…</string>
 

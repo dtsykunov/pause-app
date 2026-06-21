@@ -37,6 +37,13 @@ class MainActivity : AppCompatActivity() {
             Prefs.setPauseSeconds(this, seconds)
         }
 
+        binding.showTimerSwitch.isChecked = Prefs.showTimer(this)
+        binding.showTimerRow.setOnClickListener {
+            val show = !binding.showTimerSwitch.isChecked
+            binding.showTimerSwitch.isChecked = show
+            Prefs.setShowTimer(this, show)
+        }
+
         binding.phraseInput.setText(Prefs.phrase(this))
         binding.phraseInput.doAfterTextChanged {
             Prefs.setPhrase(this, it?.toString().orEmpty())
