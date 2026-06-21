@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.text.TextUtils
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import dev.tsykunov.pause.databinding.ActivityMainBinding
 import kotlin.concurrent.thread
@@ -23,13 +24,22 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         }
 
+        binding.statsButton.setOnClickListener {
+            startActivity(Intent(this, StatsActivity::class.java))
+        }
+
         val initial = Prefs.pauseSeconds(this).coerceIn(Prefs.MIN_DURATION, Prefs.MAX_DURATION)
         binding.durationSlider.value = initial.toFloat()
-        binding.durationLabel.text = getString(R.string.pause_duration, initial)
+        binding.durationLabel.text = getString(R.string.duration_value, initial)
         binding.durationSlider.addOnChangeListener { _, value, _ ->
             val seconds = value.toInt()
-            binding.durationLabel.text = getString(R.string.pause_duration, seconds)
+            binding.durationLabel.text = getString(R.string.duration_value, seconds)
             Prefs.setPauseSeconds(this, seconds)
+        }
+
+        binding.phraseInput.setText(Prefs.phrase(this))
+        binding.phraseInput.doAfterTextChanged {
+            Prefs.setPhrase(this, it?.toString().orEmpty())
         }
 
         binding.appsRecycler.layoutManager = LinearLayoutManager(this)
@@ -38,9 +48,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        val enabled = isServiceEnabled()
         binding.statusText.text =
-            if (isServiceEnabled()) getString(R.string.status_enabled)
-            else getString(R.string.status_disabled)
+            getString(if (enabled) R.string.status_on else R.string.status_off)
+        binding.statusText.setTextColor(
+            getColor(if (enabled) R.color.breath else R.color.text_dim)
+        )
+        binding.accessButton.visibility = if (enabled) android.view.View.GONE else android.view.View.VISIBLE
     }
 
     private fun loadApps() {

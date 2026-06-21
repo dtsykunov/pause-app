@@ -1,14 +1,19 @@
 <resources>
     <string name="app_name">Pause</string>
+    <string name="tagline">A breath before you open.</string>
     <string name="service_label">Pause monitor</string>
     <string name="service_description">Detects when you open a chosen app and shows a calming pause before you continue.</string>
 
-    <string name="status_enabled">Accessibility access: ON</string>
-    <string name="status_disabled">Accessibility access: OFF — tap to enable</string>
-    <string name="enable_access">Enable accessibility access</string>
+    <string name="status_on">Accessibility access is on</string>
+    <string name="status_off">Accessibility access is off</string>
+    <string name="turn_on">Turn on</string>
 
-    <string name="pause_duration">Pause duration: %1$d s</string>
-    <string name="apps_header">Apps to pause</string>
+    <string name="section_length">Pause length</string>
+    <string name="section_message">Message</string>
+    <string name="section_apps">Paused apps</string>
+
+    <string name="duration_value">%1$d seconds</string>
+    <string name="phrase_hint">Shown during the pause</string>
     <string name="loading">Loading apps…</string>
 
     <string name="overlay_opening">Opening %1$s</string>
@@ -16,5 +21,12 @@
     <string name="overlay_attempts_many">You\'ve opened it %1$d times in the last 24h</string>
     <string name="overlay_breathe">Breathe</string>
     <string name="overlay_open">Open anyway</string>
-    <string name="overlay_close">Not now</string>
+    <string name="overlay_close">Cancel</string>
+
+    <string name="view_stats">Stats</string>
+    <string name="stats_title">Stats</string>
+    <string name="stats_subtitle">Per app, all time</string>
+    <string name="stat_details">Shown %1$d · Opened %2$d · Cancelled %3$d</string>
+    <string name="stats_empty">No pauses yet. They\'ll show up here once you open a paused app.</string>
+    <string name="reset_stats">Reset stats</string>
 </resources>

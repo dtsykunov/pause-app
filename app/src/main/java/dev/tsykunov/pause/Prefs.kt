@@ -8,12 +8,18 @@ object Prefs {
     private const val FILE = "pause_prefs"
     private const val KEY_BLOCKED = "blocked_packages"
     private const val KEY_DURATION = "pause_seconds"
+    private const val KEY_PHRASE = "pause_phrase"
+    private const val KEY_STAT_PKGS = "stat_packages"
+    private const val STAT_INTERRUPTIONS = "si_"
+    private const val STAT_OPENS = "so_"
+    private const val STAT_CANCELS = "sc_"
     private const val ATTEMPTS_PREFIX = "attempts_"
     private const val WINDOW_MS = 24L * 60 * 60 * 1000
 
     const val DEFAULT_DURATION = 8
     const val MIN_DURATION = 3
     const val MAX_DURATION = 30
+    const val DEFAULT_PHRASE = "Breathe"
 
     private fun sp(c: Context): SharedPreferences =
         c.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -35,6 +41,16 @@ object Prefs {
         sp(c).edit().putInt(KEY_DURATION, seconds).apply()
     }
 
+    /** The message shown during the pause; falls back to the default when blank. */
+    fun phrase(c: Context): String {
+        val saved = sp(c).getString(KEY_PHRASE, null)?.trim()
+        return if (saved.isNullOrEmpty()) DEFAULT_PHRASE else saved
+    }
+
+    fun setPhrase(c: Context, phrase: String) {
+        sp(c).edit().putString(KEY_PHRASE, phrase).apply()
+    }
+
     /** Record an open attempt for [pkg] and return the number of attempts in the last 24h. */
     fun recordAttempt(c: Context, pkg: String): Int {
         val now = System.currentTimeMillis()
@@ -47,5 +63,50 @@ object Prefs {
         kept.add(now)
         sp(c).edit().putString(key, kept.joinToString(",")).apply()
         return kept.size
+    }
+
+    // ---- Per-app lifetime stats ----
+
+    data class AppStat(
+        val packageName: String,
+        val interruptions: Int,
+        val opens: Int,
+        val cancels: Int,
+    )
+
+    private fun statPackages(c: Context): Set<String> =
+        sp(c).getStringSet(KEY_STAT_PKGS, emptySet())?.toSet() ?: emptySet()
+
+    private fun inc(c: Context, prefix: String, pkg: String) {
+        val key = prefix + pkg
+        val pkgs = statPackages(c).toMutableSet().apply { add(pkg) }
+        sp(c).edit()
+            .putInt(key, sp(c).getInt(key, 0) + 1)
+            .putStringSet(KEY_STAT_PKGS, pkgs)
+            .apply()
+    }
+
+    fun incInterruptions(c: Context, pkg: String) = inc(c, STAT_INTERRUPTIONS, pkg)
+    fun incOpens(c: Context, pkg: String) = inc(c, STAT_OPENS, pkg)
+    fun incCancels(c: Context, pkg: String) = inc(c, STAT_CANCELS, pkg)
+
+    /** Stats for every app that has any recorded activity. */
+    fun allStats(c: Context): List<AppStat> = statPackages(c).map { pkg ->
+        AppStat(
+            packageName = pkg,
+            interruptions = sp(c).getInt(STAT_INTERRUPTIONS + pkg, 0),
+            opens = sp(c).getInt(STAT_OPENS + pkg, 0),
+            cancels = sp(c).getInt(STAT_CANCELS + pkg, 0),
+        )
+    }
+
+    fun resetStats(c: Context) {
+        val edit = sp(c).edit()
+        for (pkg in statPackages(c)) {
+            edit.remove(STAT_INTERRUPTIONS + pkg)
+            edit.remove(STAT_OPENS + pkg)
+            edit.remove(STAT_CANCELS + pkg)
+        }
+        edit.remove(KEY_STAT_PKGS).apply()
     }
 }

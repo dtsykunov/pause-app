@@ -25,6 +25,7 @@ class InterventionOverlay(
     private val appLabel: String,
     private val attempts: Int,
     private val seconds: Int,
+    private val phrase: String,
     private val onOpenAnyway: () -> Unit,
     private val onClose: () -> Unit,
 ) {
@@ -84,15 +85,17 @@ class InterventionOverlay(
             binding.root.context.getString(R.string.overlay_attempts_many, attempts)
         }
         binding.countdownText.text = seconds.toString()
+        binding.breatheText.text = phrase
     }
 
     private fun startBreathing() {
         val anim = ScaleAnimation(
-            0.6f, 1f, 0.6f, 1f,
+            0.72f, 1f, 0.72f, 1f,
             Animation.RELATIVE_TO_SELF, 0.5f,
             Animation.RELATIVE_TO_SELF, 0.5f
         ).apply {
-            duration = 2600
+            // ~5s per phase => ~10s inhale/exhale cycle, a slow deep-breathing pace.
+            duration = 5000
             repeatCount = Animation.INFINITE
             repeatMode = Animation.REVERSE
             interpolator = AccelerateDecelerateInterpolator()
@@ -114,9 +117,9 @@ class InterventionOverlay(
     }
 
     private fun revealButtons() {
-        binding.buttonsRow.alpha = 0f
-        binding.buttonsRow.visibility = View.VISIBLE
-        binding.buttonsRow.animate().alpha(1f).setDuration(300).start()
+        binding.openButton.alpha = 0f
+        binding.openButton.visibility = View.VISIBLE
+        binding.openButton.animate().alpha(1f).setDuration(300).start()
     }
 
     private fun slideOutAndRemove() {

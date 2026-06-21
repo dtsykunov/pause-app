@@ -1,6 +1,18 @@
 <resources>
-    <color name="overlay_bg">#0F1722</color>
-    <color name="overlay_circle">#3D5AFE</color>
-    <color name="overlay_text">#F5F7FA</color>
-    <color name="overlay_text_dim">#9AA7B8</color>
+    <!-- Core palette: a calm night ground with a single breath-teal accent. -->
+    <color name="night">#0E141B</color>
+    <color name="panel">#161F29</color>
+    <color name="panel_variant">#1C2731</color>
+    <color name="breath">#5BC0BE</color>
+    <color name="breath_container">#22383A</color>
+    <color name="text_primary">#EAF0F2</color>
+    <color name="text_dim">#8A99A6</color>
+    <color name="outline">#2A3742</color>
+
+    <!-- Pause overlay -->
+    <color name="overlay_bg">#0E141B</color>
+    <color name="overlay_circle">#5BC0BE</color>
+    <color name="overlay_text">#EAF0F2</color>
+    <color name="overlay_text_dim">#8A99A6</color>
+    <color name="overlay_countdown">#0E141B</color>
 </resources>

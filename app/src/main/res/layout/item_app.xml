@@ -2,10 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:background="?attr/selectableItemBackground"
     android:gravity="center_vertical"
-    android:paddingVertical="10dp"
-    android:background="?attr/selectableItemBackground">
+    android:minHeight="56dp"
+    android:orientation="horizontal"
+    android:paddingVertical="8dp">
 
     <ImageView
         android:id="@+id/appIcon"
@@ -17,14 +18,16 @@
         android:id="@+id/appLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_weight="1"
-        android:layout_marginStart="14dp"
+        android:textColor="@color/text_primary"
         android:textSize="16sp" />
 
     <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/appSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
         android:clickable="false"
         android:focusable="false" />
 </LinearLayout>

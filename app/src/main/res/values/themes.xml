@@ -1,5 +1,31 @@
 <resources>
     <style name="Theme.Pause" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="colorPrimary">@color/breath</item>
+        <item name="colorOnPrimary">@color/night</item>
+        <item name="colorPrimaryContainer">@color/breath_container</item>
+        <item name="colorOnPrimaryContainer">@color/breath</item>
+        <item name="colorSecondary">@color/breath</item>
+        <item name="colorOnSecondary">@color/night</item>
+        <item name="colorSecondaryContainer">@color/panel_variant</item>
+        <item name="colorOnSecondaryContainer">@color/text_primary</item>
+        <item name="android:colorBackground">@color/night</item>
+        <item name="colorSurface">@color/panel</item>
+        <item name="colorSurfaceVariant">@color/panel_variant</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/text_dim</item>
+        <item name="colorOutline">@color/outline</item>
+        <item name="colorOutlineVariant">@color/outline</item>
+        <item name="android:statusBarColor">@color/night</item>
+        <item name="android:navigationBarColor">@color/night</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!-- Small tracked, uppercase section labels. -->
+    <style name="Eyebrow">
+        <item name="android:textColor">@color/text_dim</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:letterSpacing">0.12</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 </resources>
