@@ -1,0 +1,72 @@
+name: Build and publish APK
+
+# Tag a commit (e.g. `git tag v1.0.0 && git push --tags`) to build a signed
+# release APK and publish it as a GitHub Release. Can also be run manually.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install SDK packages
+        run: yes | sdkmanager "platforms;android-34" "build-tools;35.0.0" > /dev/null
+
+      - name: Restore signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
+          cat > keystore.properties <<EOF
+          storeFile=release.keystore
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+
+      - name: Build release APK
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleRelease
+
+      - name: Name the APK
+        run: cp app/build/outputs/apk/release/app-release.apk "pause-${GITHUB_REF_NAME}.apk"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: pause-*.apk
+          name: Pause ${{ github.ref_name }}
+          generate_release_notes: true
+          body: |
+            **Pause** — a calm, open-source mindful pause before you open distracting apps on Android.
+
+            A breathing screen with a short timed pause and an open count appears when you launch a
+            chosen app, adding gentle friction so you open with intention. No accounts, no tracking,
+            no subscription.
+
+            **Install:** download `pause-${{ github.ref_name }}.apk` below, open it on your phone, and
+            allow installs from unknown sources if prompted. Then grant accessibility access and pick
+            the apps to pause.
+
+            Topics: digital wellbeing · screen time · focus · app blocker alternative · mindful phone use
