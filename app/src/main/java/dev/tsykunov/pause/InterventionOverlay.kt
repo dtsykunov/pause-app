@@ -68,10 +68,11 @@ class InterventionOverlay(
         isShowing = true
         binding.root.requestFocus()
 
-        binding.panel.post {
-            val h = binding.panel.height.toFloat()
-            binding.panel.translationY = h
-            binding.panel.animate().translationY(0f).setDuration(420).start()
+        // Cover the screen instantly so the app behind isn't briefly visible; ease the
+        // content in rather than sliding the whole panel up.
+        binding.content.alpha = 0f
+        binding.content.post {
+            binding.content.animate().alpha(1f).setDuration(250).start()
             startBreathing()
             startCountdown()
         }
