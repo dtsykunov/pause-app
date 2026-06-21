@@ -23,7 +23,7 @@ object Prefs {
     const val DEFAULT_DURATION = 8
     const val MIN_DURATION = 3
     const val MAX_DURATION = 30
-    const val DEFAULT_PHRASE = "Breathe"
+    const val DEFAULT_PHRASE = "Take a moment"
     const val DEFAULT_ALLOW_MIN = 5
     const val MIN_ALLOW_MIN = 1
     const val MAX_ALLOW_MIN = 60

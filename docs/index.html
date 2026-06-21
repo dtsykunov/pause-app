@@ -11,9 +11,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Pause — a mindful breath before you open distracting apps (Android)</title>
-  <meta name="description" content="Pause is a free, open-source Android app that shows a calming breathing screen before you open distracting apps. Gentle friction for less doomscrolling — no account, no tracking, no subscription." />
-  <meta name="keywords" content="Pause app, mindful phone use, screen time, digital wellbeing, focus, stop doomscrolling, app blocker alternative, Android accessibility, breathing pause" />
+  <title>Pause — a short, timed pause before you open distracting apps (Android)</title>
+  <meta name="description" content="Pause is a free, open-source Android app that adds a short, timed pause before you open distracting apps, so opening is a deliberate choice. Made for older phones without built-in screen-time tools. No account, no tracking, no subscription." />
+  <meta name="keywords" content="screen time, digital wellbeing, focus, reduce phone distractions, app blocker alternative, Pause Point alternative, Android accessibility, older Android phones, open-source" />
   <meta name="author" content="Pause" />
   <meta name="theme-color" content="#F5F0FC" />
   <link rel="canonical" href="https://dtsykunov.github.io/pause-and-think-app/" />
@@ -22,13 +22,13 @@
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Pause" />
-  <meta property="og:title" content="Pause — a mindful breath before you open distracting apps" />
-  <meta property="og:description" content="A calming breathing screen before you open distracting apps on Android. Free, open-source, no tracking, no subscription." />
+  <meta property="og:title" content="Pause — a timed pause before you open distracting apps" />
+  <meta property="og:description" content="A short, timed pause before you open distracting apps on Android. Free, open-source, no tracking, no subscription." />
   <meta property="og:url" content="https://dtsykunov.github.io/pause-and-think-app/" />
   <meta property="og:image" content="https://dtsykunov.github.io/pause-and-think-app/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Pause — a mindful breath before you open distracting apps" />
-  <meta name="twitter:description" content="A calming breathing screen before you open distracting apps on Android. Free and open-source." />
+  <meta name="twitter:title" content="Pause — a timed pause before you open distracting apps" />
+  <meta name="twitter:description" content="A short, timed pause before you open distracting apps on Android. Free and open-source." />
   <meta name="twitter:image" content="https://dtsykunov.github.io/pause-and-think-app/og.png" />
 
   <!-- Structured data for search engines -->
@@ -39,7 +39,7 @@
     "name": "Pause",
     "operatingSystem": "Android 7.0+",
     "applicationCategory": "LifestyleApplication",
-    "description": "A free, open-source Android app that shows a calming breathing screen before you open distracting apps, adding gentle friction so you open with intention.",
+    "description": "A free, open-source Android app that adds a short, timed pause before you open distracting apps, so you open with intention. Aimed at older phones without built-in screen-time tools.",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "downloadUrl": "https://github.com/dtsykunov/pause-and-think-app/releases/latest"
   }
@@ -88,7 +88,7 @@
     .btn {
       display: inline-block; background: var(--breath); color: var(--night);
       font-weight: 600; text-decoration: none; padding: 14px 30px;
-      border-radius: 28px; font-size: 1.05rem;
+      border-radius: 28px; font-size: 1.05rem; margin: 6px;
     }
     .btn:hover { filter: brightness(1.07); }
     .btn.ghost { background: transparent; color: var(--dim); font-weight: 500; }
@@ -118,7 +118,7 @@
     <header>
       <div class="ring" aria-hidden="true"><span></span></div>
       <h1>Pause</h1>
-      <p class="tagline">A calming breath before you open distracting apps — so you open with intention, not reflex.</p>
+      <p class="tagline">A short pause before chosen apps open — enough to turn an automatic tap into a deliberate choice.</p>
       <a class="btn" href="https://github.com/dtsykunov/pause-and-think-app/releases/latest">Download for Android</a>
       <a class="btn ghost" href="https://github.com/dtsykunov/pause-and-think-app">Source code on GitHub</a>
       <p class="sub">Free &amp; open-source · no account · no tracking · no subscription</p>
@@ -126,48 +126,42 @@
 
     <section>
       <h2>What it does</h2>
-      <p>When you open an app you've chosen to pause, Pause covers the screen with a slow breathing
-      circle and a short timed pause, and shows how many times you've opened that app today. Only then
-      can you continue — or change your mind. It's gentle friction, not a hard block: enough to turn an
-      automatic tap into a deliberate choice.</p>
+      <p>When you open an app you've chosen, Pause covers the screen with a short countdown before you
+      can continue — so you open on purpose, or back out. It's friction, not a hard block.</p>
     </section>
 
     <section>
       <h2>Features</h2>
       <div class="features">
-        <div class="feature"><h3>Breathing pause</h3><p>A slow, calming animation instead of an instant open.</p></div>
-        <div class="feature"><h3>Your apps, your rules</h3><p>Pick exactly which apps get a pause.</p></div>
-        <div class="feature"><h3>Open count</h3><p>See how often you've reached for an app in the last 24 hours.</p></div>
-        <div class="feature"><h3>Adjustable</h3><p>Set the pause length, your own message, and hide the countdown.</p></div>
-        <div class="feature"><h3>Quiet stats</h3><p>Track pauses, opens, cancels, and time spent breathing.</p></div>
-        <div class="feature"><h3>Private by design</h3><p>Everything stays on your phone. No accounts, no analytics.</p></div>
+        <div class="feature"><h3>Timed pause</h3><p>A short countdown before the app opens. You choose the length.</p></div>
+        <div class="feature"><h3>Per app</h3><p>Pick which apps get a pause. Everything else opens normally.</p></div>
+        <div class="feature"><h3>Open count</h3><p>Shows how many times you've opened that app in the last 24 hours.</p></div>
+        <div class="feature"><h3>Adjustable</h3><p>Set the pause length, a custom message, and whether the countdown shows.</p></div>
+        <div class="feature"><h3>Local stats</h3><p>Per-app pauses, opens, and cancels, plus total time paused.</p></div>
+        <div class="feature"><h3>No network access</h3><p>Stays on your phone. No account, no analytics — the app can't reach the internet.</p></div>
       </div>
     </section>
 
     <section>
-      <h2>Built-in screen-time tools</h2>
-      <p>Google's Digital Wellbeing launched on Pixel and Android One devices with Android 9 Pie
-      (2018). Since September 2019, Google has required all GMS-certified devices launching on or
-      upgrading to Android 9 or later to ship a digital-wellbeing solution — so most phones sold
-      after that point include app timers, Focus Mode (Android 10+), and a Bedtime/Wind Down mode.
-      Samsung's One UI ships its own equivalent under "Digital Wellbeing and parental controls."</p>
-      <p>Pause is aimed at people these tools don't reach:</p>
+      <h2>Check your phone first</h2>
+      <p>Many recent Android phones already do this. Android's Digital Wellbeing includes app timers
+      and Focus mode, and Android 17 adds <strong>Pause Point</strong> — a built-in delay before
+      selected apps open — rolling out on Pixel and Samsung. If your phone has these, use them: they're
+      better integrated and need no extra app.</p>
+      <p>Pause is for phones the built-in tools don't reach:</p>
       <div class="features">
-        <div class="feature"><h3>Older devices</h3><p>Devices running Android 8 (Oreo) or earlier predate Digital Wellbeing entirely.</p></div>
-        <div class="feature"><h3>Custom ROMs</h3><p>AOSP-based ROMs such as LineageOS don't ship the proprietary Google Wellbeing app.</p></div>
-        <div class="feature"><h3>Non-GMS devices</h3><p>Some budget or regionally-sold phones are not Google-certified and ship without GMS apps, including Digital Wellbeing.</p></div>
-        <div class="feature"><h3>Lighter alternative</h3><p>Even where built-in tools exist, Pause is a single-purpose, open-source option that needs no Google account.</p></div>
+        <div class="feature"><h3>Older Android</h3><p>Android 8 (Oreo) and earlier predate Digital Wellbeing.</p></div>
+        <div class="feature"><h3>Custom ROMs</h3><p>AOSP ROMs like LineageOS ship without Google's Digital Wellbeing.</p></div>
+        <div class="feature"><h3>Non-Google devices</h3><p>Some budget or regional phones omit Google's apps, including Digital Wellbeing.</p></div>
       </div>
     </section>
 
     <section>
       <h2>Other apps</h2>
-      <p>Several apps offer similar friction — delaying or blocking access to chosen apps. Many bundle
-      extra features alongside the core mechanism: habit trackers, usage leaderboards, browser filters,
-      or parental controls. Payment models vary too: subscriptions, one-time purchases, or feature
-      tiers that can be hard to compare. Pause does exactly one thing — a calming pause before an app
-      opens — and nothing else. It is free, open-source, and has no payment, no account, and no
-      subscription of any kind.</p>
+      <p>Other apps add similar friction, but many bundle extra features — habit trackers, leaderboards,
+      browser filters, parental controls — or put the core behind a subscription. Pause does one thing:
+      a timed pause before a chosen app opens. It's free and open-source, with no account and no
+      payment.</p>
     </section>
 
     <section>

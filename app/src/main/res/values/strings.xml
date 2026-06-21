@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Pause</string>
-    <string name="tagline">A breath before you open.</string>
+    <string name="tagline">A pause before you open.</string>
     <string name="service_label">Pause monitor</string>
-    <string name="service_description">Detects when you open a chosen app and shows a calming pause before you continue.</string>
+    <string name="service_description">Detects when you open a chosen app and shows a timed pause before you continue.</string>
 
     <string name="status_on">Accessibility access is on</string>
     <string name="status_off">Accessibility access is off</string>
@@ -29,7 +29,7 @@
 
     <string name="help">Explain this option</string>
     <string name="got_it">Got it</string>
-    <string name="help_length_body">How long the breathing screen stays before you can continue. The “Open anyway” button only appears once this time is up.</string>
+    <string name="help_length_body">How long the pause screen stays before you can continue. The “Open anyway” button only appears once this time is up.</string>
     <string name="help_allow_body">After you tap “Open anyway” for an app, Pause won\'t interrupt that app again for this many minutes, so you can use it without repeated pauses. It applies only to that one app.</string>
     <string name="loading">Loading apps…</string>
 
@@ -38,7 +38,7 @@
     <string name="overlay_attempts_many">Tried %1$d times in the last 24h</string>
     <string name="overlay_last_opened_one">Last opened %1$s ago, tried once in the last 24h</string>
     <string name="overlay_last_opened_many">Last opened %1$s ago, tried %2$d times in the last 24h</string>
-    <string name="overlay_breathe">Breathe</string>
+    <string name="overlay_breathe">Take a moment</string>
     <string name="overlay_open">Open anyway</string>
     <string name="overlay_close">Cancel</string>
 

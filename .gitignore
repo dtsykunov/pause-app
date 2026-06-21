@@ -11,3 +11,6 @@ captures/
 # Release signing — keep private
 keystore.properties
 *.keystore
+
+# Local agent / editor settings
+.claude/
