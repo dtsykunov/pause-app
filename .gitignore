@@ -7,3 +7,7 @@ local.properties
 captures/
 .externalNativeBuild/
 .cxx/
+
+# Release signing — keep private
+keystore.properties
+*.keystore
