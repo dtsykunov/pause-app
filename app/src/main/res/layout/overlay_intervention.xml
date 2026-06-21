@@ -38,18 +38,7 @@
                 android:gravity="center"
                 android:textColor="@color/overlay_text_dim"
                 android:textSize="14sp"
-                tools:text="You've opened it 5 times in the last 24h" />
-
-            <TextView
-                android:id="@+id/lastOpenedText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center"
-                android:textColor="@color/overlay_text_dim"
-                android:textSize="14sp"
-                android:visibility="gone"
-                tools:text="Last opened 10m ago" />
+                tools:text="Last opened 10m ago, tried 5 times in the last 24h" />
 
             <FrameLayout
                 android:layout_width="220dp"

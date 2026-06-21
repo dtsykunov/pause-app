@@ -82,18 +82,15 @@ class InterventionOverlay(
     private fun bindTexts() {
         binding.openingText.text =
             binding.root.context.getString(R.string.overlay_opening, appLabel)
-        binding.attemptsText.text = if (attempts <= 1) {
-            binding.root.context.getString(R.string.overlay_attempts_one)
-        } else {
-            binding.root.context.getString(R.string.overlay_attempts_many, attempts)
-        }
+        val ctx = binding.root.context
         val sinceLast = lastOpenedAt?.let { System.currentTimeMillis() - it }?.takeIf { it >= 0 }
-        if (sinceLast != null) {
-            binding.lastOpenedText.text =
-                binding.root.context.getString(R.string.overlay_last_opened, formatAgo(sinceLast))
-            binding.lastOpenedText.visibility = View.VISIBLE
-        } else {
-            binding.lastOpenedText.visibility = View.GONE
+        binding.attemptsText.text = when {
+            sinceLast != null && attempts <= 1 ->
+                ctx.getString(R.string.overlay_last_opened_one, formatAgo(sinceLast))
+            sinceLast != null ->
+                ctx.getString(R.string.overlay_last_opened_many, formatAgo(sinceLast), attempts)
+            attempts <= 1 -> ctx.getString(R.string.overlay_attempts_one)
+            else -> ctx.getString(R.string.overlay_attempts_many, attempts)
         }
         binding.countdownText.text = seconds.toString()
         binding.countdownText.visibility = if (showTimer) View.VISIBLE else View.GONE

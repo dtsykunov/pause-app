@@ -34,9 +34,10 @@
     <string name="loading">Loading apps…</string>
 
     <string name="overlay_opening">Opening %1$s</string>
-    <string name="overlay_attempts_one">You\'ve opened it 1 time in the last 24h</string>
-    <string name="overlay_attempts_many">You\'ve opened it %1$d times in the last 24h</string>
-    <string name="overlay_last_opened">Last opened %1$s ago</string>
+    <string name="overlay_attempts_one">Tried once in the last 24h</string>
+    <string name="overlay_attempts_many">Tried %1$d times in the last 24h</string>
+    <string name="overlay_last_opened_one">Last opened %1$s ago, tried once in the last 24h</string>
+    <string name="overlay_last_opened_many">Last opened %1$s ago, tried %2$d times in the last 24h</string>
     <string name="overlay_breathe">Breathe</string>
     <string name="overlay_open">Open anyway</string>
     <string name="overlay_close">Cancel</string>
@@ -44,7 +45,7 @@
     <string name="view_stats">Stats</string>
     <string name="stats_title">Stats</string>
     <string name="stats_subtitle">Per app, all time</string>
-    <string name="breathing_total">%1$s spent breathing</string>
+    <string name="breathing_total">%1$s spent paused</string>
     <string name="stats_totals">Opened %1$d · Cancelled %2$d, all time</string>
     <string name="stat_details">Shown %1$d · Opened %2$d · Cancelled %3$d</string>
     <string name="stats_empty">No pauses yet. They\'ll show up here once you open a paused app.</string>
