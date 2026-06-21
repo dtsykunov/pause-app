@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<!--
+  GitHub Pages site for Pause. Serve from /docs on the default branch
+  (Settings → Pages → Source: deploy from branch, /docs).
+  Repo/URL assumption (change in one place here if different):
+    repo:  dtsykunov/pause-and-think-app
+    site:  https://dtsykunov.github.io/pause-and-think-app/
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Pause — a mindful breath before you open distracting apps (Android)</title>
+  <meta name="description" content="Pause is a free, open-source Android app that shows a calming breathing screen before you open distracting apps. Gentle friction for less doomscrolling — no account, no tracking, no subscription." />
+  <meta name="keywords" content="Pause app, mindful phone use, screen time, digital wellbeing, focus, stop doomscrolling, app blocker alternative, Android accessibility, breathing pause" />
+  <meta name="author" content="Pause" />
+  <meta name="theme-color" content="#0E141B" />
+  <link rel="canonical" href="https://dtsykunov.github.io/pause-and-think-app/" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Pause" />
+  <meta property="og:title" content="Pause — a mindful breath before you open distracting apps" />
+  <meta property="og:description" content="A calming breathing screen before you open distracting apps on Android. Free, open-source, no tracking, no subscription." />
+  <meta property="og:url" content="https://dtsykunov.github.io/pause-and-think-app/" />
+  <meta property="og:image" content="https://dtsykunov.github.io/pause-and-think-app/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Pause — a mindful breath before you open distracting apps" />
+  <meta name="twitter:description" content="A calming breathing screen before you open distracting apps on Android. Free and open-source." />
+  <meta name="twitter:image" content="https://dtsykunov.github.io/pause-and-think-app/og.png" />
+
+  <!-- Structured data for search engines -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Pause",
+    "operatingSystem": "Android 7.0+",
+    "applicationCategory": "LifestyleApplication",
+    "description": "A free, open-source Android app that shows a calming breathing screen before you open distracting apps, adding gentle friction so you open with intention.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "downloadUrl": "https://github.com/dtsykunov/pause-and-think-app/releases/latest"
+  }
+  </script>
+
+  <style>
+    :root {
+      --night: #0E141B;
+      --panel: #161F29;
+      --breath: #5BC0BE;
+      --text: #EAF0F2;
+      --dim: #8A99A6;
+      --outline: #2A3742;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--night);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+
+    /* Hero */
+    header { text-align: center; padding: 72px 0 56px; }
+    .ring {
+      width: 132px; height: 132px; margin: 0 auto 36px;
+      border-radius: 50%;
+      border: 7px solid var(--breath);
+      display: grid; place-items: center;
+      animation: breathe 10s ease-in-out infinite;
+    }
+    .ring span { width: 46px; height: 46px; border-radius: 50%; background: var(--breath); }
+    @keyframes breathe {
+      0%, 100% { transform: scale(0.78); }
+      50%      { transform: scale(1); }
+    }
+    @media (prefers-reduced-motion: reduce) { .ring { animation: none; } }
+
+    h1 { font-size: 2.6rem; font-weight: 300; letter-spacing: 0.01em; margin: 0 0 10px; }
+    .tagline { color: var(--dim); font-size: 1.15rem; margin: 0 auto 32px; max-width: 36ch; }
+
+    .btn {
+      display: inline-block; background: var(--breath); color: var(--night);
+      font-weight: 600; text-decoration: none; padding: 14px 30px;
+      border-radius: 28px; font-size: 1.05rem;
+    }
+    .btn:hover { filter: brightness(1.07); }
+    .btn.ghost { background: transparent; color: var(--dim); font-weight: 500; }
+    .sub { color: var(--dim); font-size: 0.9rem; margin-top: 14px; }
+
+    section { padding: 40px 0; border-top: 1px solid var(--outline); }
+    h2 {
+      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--dim); font-weight: 600; margin: 0 0 20px;
+    }
+    .features { display: grid; gap: 22px; }
+    @media (min-width: 560px) { .features { grid-template-columns: 1fr 1fr; } }
+    .feature h3 { margin: 0 0 4px; font-size: 1.05rem; font-weight: 600; }
+    .feature p { margin: 0; color: var(--dim); }
+
+    ol.steps { margin: 0; padding-left: 1.2em; }
+    ol.steps li { margin-bottom: 10px; }
+    ol.steps li::marker { color: var(--breath); }
+
+    footer { padding: 40px 0 64px; text-align: center; color: var(--dim); font-size: 0.9rem; border-top: 1px solid var(--outline); }
+    footer a { color: var(--breath); text-decoration: none; }
+    a.inline { color: var(--breath); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="ring" aria-hidden="true"><span></span></div>
+      <h1>Pause</h1>
+      <p class="tagline">A calming breath before you open distracting apps — so you open with intention, not reflex.</p>
+      <a class="btn" href="https://github.com/dtsykunov/pause-and-think-app/releases/latest">Download for Android</a>
+      <p class="sub">Free &amp; open-source · no account · no tracking · no subscription</p>
+    </header>
+
+    <section>
+      <h2>What it does</h2>
+      <p>When you open an app you've chosen to pause, Pause covers the screen with a slow breathing
+      circle and a short timed pause, and shows how many times you've opened that app today. Only then
+      can you continue — or change your mind. It's gentle friction, not a hard block: enough to turn an
+      automatic tap into a deliberate choice.</p>
+    </section>
+
+    <section>
+      <h2>Features</h2>
+      <div class="features">
+        <div class="feature"><h3>Breathing pause</h3><p>A slow, calming animation instead of an instant open.</p></div>
+        <div class="feature"><h3>Your apps, your rules</h3><p>Pick exactly which apps get a pause.</p></div>
+        <div class="feature"><h3>Open count</h3><p>See how often you've reached for an app in the last 24 hours.</p></div>
+        <div class="feature"><h3>Adjustable</h3><p>Set the pause length, your own message, and hide the countdown.</p></div>
+        <div class="feature"><h3>Quiet stats</h3><p>Track pauses, opens, cancels, and time spent breathing.</p></div>
+        <div class="feature"><h3>Private by design</h3><p>Everything stays on your phone. No accounts, no analytics.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Set up</h2>
+      <ol class="steps">
+        <li><a class="inline" href="https://github.com/dtsykunov/pause-and-think-app/releases/latest">Download the latest APK</a> and open it on your phone (allow installs from unknown sources if asked).</li>
+        <li>Open Pause and turn on accessibility access.</li>
+        <li>Set your pause length and message, then choose the apps to pause.</li>
+      </ol>
+    </section>
+
+    <footer>
+      <p>Open-source on <a href="https://github.com/dtsykunov/pause-and-think-app">GitHub</a>.</p>
+    </footer>
+  </div>
+</body>
+</html>
