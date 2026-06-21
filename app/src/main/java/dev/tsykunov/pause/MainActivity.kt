@@ -9,6 +9,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dev.tsykunov.pause.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -30,6 +31,13 @@ class MainActivity : AppCompatActivity() {
 
         binding.pausedAppsRow.setOnClickListener {
             startActivity(Intent(this, AppsActivity::class.java))
+        }
+
+        binding.lengthHelp.setOnClickListener {
+            showHint(R.string.section_length, R.string.help_length_body)
+        }
+        binding.allowHelp.setOnClickListener {
+            showHint(R.string.section_allow, R.string.help_allow_body)
         }
 
         val initial = Prefs.pauseSeconds(this).coerceIn(Prefs.MIN_DURATION, Prefs.MAX_DURATION)
@@ -67,6 +75,14 @@ class MainActivity : AppCompatActivity() {
             binding.allowLabel.text = getString(R.string.allow_value, minutes)
             Prefs.setAllowMinutes(this, minutes)
         }
+    }
+
+    private fun showHint(titleRes: Int, bodyRes: Int) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(titleRes)
+            .setMessage(bodyRes)
+            .setPositiveButton(R.string.got_it, null)
+            .show()
     }
 
     private fun hideKeyboard() {

@@ -92,12 +92,29 @@
     </com.google.android.material.card.MaterialCardView>
 
     <!-- Pause length -->
-    <TextView
-        style="@style/Eyebrow"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
-        android:text="@string/section_length" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/Eyebrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/section_length" />
+
+        <ImageButton
+            android:id="@+id/lengthHelp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="2dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/help"
+            android:padding="8dp"
+            android:src="@drawable/ic_help" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/durationLabel"
@@ -194,12 +211,29 @@
         android:text="@string/save" />
 
     <!-- Allow window after Open anyway -->
-    <TextView
-        style="@style/Eyebrow"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="@string/section_allow" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/Eyebrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/section_allow" />
+
+        <ImageButton
+            android:id="@+id/allowHelp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="2dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/help"
+            android:padding="8dp"
+            android:src="@drawable/ic_help" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/allowLabel"

@@ -27,6 +27,11 @@
     <string name="message_saved">Message saved</string>
     <string name="section_allow">After Open anyway</string>
     <string name="allow_value">Skip the pause for %1$d min</string>
+
+    <string name="help">Explain this option</string>
+    <string name="got_it">Got it</string>
+    <string name="help_length_body">How long the breathing screen stays before you can continue. The “Open anyway” button only appears once this time is up.</string>
+    <string name="help_allow_body">After you tap “Open anyway” for an app, Pause won\'t interrupt that app again for this many minutes, so you can use it without repeated pauses. It applies only to that one app.</string>
     <string name="loading">Loading apps…</string>
 
     <string name="overlay_opening">Opening %1$s</string>
