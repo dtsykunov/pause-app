@@ -14,6 +14,7 @@ object Prefs {
     private const val STAT_INTERRUPTIONS = "si_"
     private const val STAT_OPENS = "so_"
     private const val STAT_CANCELS = "sc_"
+    private const val STAT_BREATH_MS = "bms_"
     private const val ATTEMPTS_PREFIX = "attempts_"
     private const val WINDOW_MS = 24L * 60 * 60 * 1000
 
@@ -97,6 +98,21 @@ object Prefs {
     fun incOpens(c: Context, pkg: String) = inc(c, STAT_OPENS, pkg)
     fun incCancels(c: Context, pkg: String) = inc(c, STAT_CANCELS, pkg)
 
+    /** Add the time the pause screen was shown for [pkg], in milliseconds. */
+    fun addBreathingMs(c: Context, pkg: String, ms: Long) {
+        if (ms <= 0) return
+        val key = STAT_BREATH_MS + pkg
+        val pkgs = statPackages(c).toMutableSet().apply { add(pkg) }
+        sp(c).edit()
+            .putLong(key, sp(c).getLong(key, 0) + ms)
+            .putStringSet(KEY_STAT_PKGS, pkgs)
+            .apply()
+    }
+
+    /** Total time spent on the pause screen across all apps, in milliseconds. */
+    fun totalBreathingMs(c: Context): Long =
+        statPackages(c).sumOf { sp(c).getLong(STAT_BREATH_MS + it, 0L) }
+
     /** Stats for every app that has any recorded activity. */
     fun allStats(c: Context): List<AppStat> = statPackages(c).map { pkg ->
         AppStat(
@@ -113,6 +129,7 @@ object Prefs {
             edit.remove(STAT_INTERRUPTIONS + pkg)
             edit.remove(STAT_OPENS + pkg)
             edit.remove(STAT_CANCELS + pkg)
+            edit.remove(STAT_BREATH_MS + pkg)
         }
         edit.remove(KEY_STAT_PKGS).apply()
     }

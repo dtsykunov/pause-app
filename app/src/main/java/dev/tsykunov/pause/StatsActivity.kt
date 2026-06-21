@@ -29,6 +29,9 @@ class StatsActivity : AppCompatActivity() {
     }
 
     private fun render() {
+        binding.breathingTotal.text =
+            getString(R.string.breathing_total, formatDuration(Prefs.totalBreathingMs(this)))
+
         val container = binding.statsContainer
         container.removeAllViews()
 
@@ -54,6 +57,19 @@ class StatsActivity : AppCompatActivity() {
             )
             row.statIcon.setImageDrawable(appIcon(stat.packageName))
             container.addView(row.root)
+        }
+    }
+
+    /** Compact human duration: "2h 5m", "12m", or "45s". */
+    private fun formatDuration(ms: Long): String {
+        val totalSec = ms / 1000
+        val h = totalSec / 3600
+        val m = (totalSec % 3600) / 60
+        val s = totalSec % 60
+        return when {
+            h > 0 -> "${h}h ${m}m"
+            m > 0 -> "${m}m ${s}s"
+            else -> "${s}s"
         }
     }
 

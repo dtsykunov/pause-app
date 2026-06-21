@@ -1,15 +1,13 @@
 package dev.tsykunov.pause
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
 import android.text.TextUtils
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
-import androidx.recyclerview.widget.LinearLayoutManager
 import dev.tsykunov.pause.databinding.ActivityMainBinding
-import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,6 +24,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.statsButton.setOnClickListener {
             startActivity(Intent(this, StatsActivity::class.java))
+        }
+
+        binding.pausedAppsRow.setOnClickListener {
+            startActivity(Intent(this, AppsActivity::class.java))
         }
 
         val initial = Prefs.pauseSeconds(this).coerceIn(Prefs.MIN_DURATION, Prefs.MAX_DURATION)
@@ -48,9 +50,6 @@ class MainActivity : AppCompatActivity() {
         binding.phraseInput.doAfterTextChanged {
             Prefs.setPhrase(this, it?.toString().orEmpty())
         }
-
-        binding.appsRecycler.layoutManager = LinearLayoutManager(this)
-        loadApps()
     }
 
     override fun onResume() {
@@ -61,42 +60,10 @@ class MainActivity : AppCompatActivity() {
         binding.statusText.setTextColor(
             getColor(if (enabled) R.color.breath else R.color.text_dim)
         )
-        binding.accessButton.visibility = if (enabled) android.view.View.GONE else android.view.View.VISIBLE
-    }
+        binding.accessButton.visibility = if (enabled) View.GONE else View.VISIBLE
 
-    private fun loadApps() {
-        thread {
-            val pm = packageManager
-            val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-            val blocked = Prefs.blockedPackages(this)
-            val entries = pm.queryIntentActivities(intent, 0)
-                .map { it.activityInfo.packageName }
-                .distinct()
-                .filter { it != packageName }
-                .mapNotNull { pkg ->
-                    try {
-                        val info = pm.getApplicationInfo(pkg, 0)
-                        AppEntry(
-                            packageName = pkg,
-                            label = pm.getApplicationLabel(info).toString(),
-                            icon = pm.getApplicationIcon(info),
-                            blocked = blocked.contains(pkg),
-                        )
-                    } catch (e: PackageManager.NameNotFoundException) {
-                        null
-                    }
-                }
-                .sortedBy { it.label.lowercase() }
-
-            runOnUiThread {
-                binding.loadingText.visibility = android.view.View.GONE
-                binding.appsRecycler.adapter = AppListAdapter(entries) { entry, blockedNow ->
-                    val current = Prefs.blockedPackages(this).toMutableSet()
-                    if (blockedNow) current.add(entry.packageName) else current.remove(entry.packageName)
-                    Prefs.setBlockedPackages(this, current)
-                }
-            }
-        }
+        val count = Prefs.blockedPackages(this).size
+        binding.pausedAppsCount.text = resources.getQuantityString(R.plurals.paused_count, count, count)
     }
 
     private fun isServiceEnabled(): Boolean {

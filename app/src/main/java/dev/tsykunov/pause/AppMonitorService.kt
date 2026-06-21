@@ -4,6 +4,7 @@ import android.accessibilityservice.AccessibilityService
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.view.accessibility.AccessibilityEvent
 
 /**
@@ -60,6 +61,7 @@ class AppMonitorService : AccessibilityService() {
     }
 
     private fun showOverlay(pkg: String, attempts: Int, seconds: Int, phrase: String, showTimer: Boolean) {
+        val shownAt = SystemClock.elapsedRealtime()
         overlay = InterventionOverlay(
             service = this,
             appLabel = appLabel(pkg),
@@ -69,11 +71,13 @@ class AppMonitorService : AccessibilityService() {
             showTimer = showTimer,
             onOpenAnyway = {
                 Prefs.incOpens(this, pkg)
+                Prefs.addBreathingMs(this, pkg, SystemClock.elapsedRealtime() - shownAt)
                 allowedUntil[pkg] = System.currentTimeMillis() + graceMs
                 overlay = null
             },
             onClose = {
                 Prefs.incCancels(this, pkg)
+                Prefs.addBreathingMs(this, pkg, SystemClock.elapsedRealtime() - shownAt)
                 overlay = null
                 performGlobalAction(GLOBAL_ACTION_HOME)
             }

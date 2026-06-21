@@ -1,5 +1,6 @@
 package dev.tsykunov.pause
 
+import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -14,9 +15,15 @@ data class AppEntry(
 )
 
 class AppListAdapter(
-    private val items: List<AppEntry>,
+    private var items: List<AppEntry>,
     private val onToggle: (AppEntry, Boolean) -> Unit,
 ) : RecyclerView.Adapter<AppListAdapter.VH>() {
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun update(newItems: List<AppEntry>) {
+        items = newItems
+        notifyDataSetChanged()
+    }
 
     inner class VH(val binding: ItemAppBinding) : RecyclerView.ViewHolder(binding.root)
 

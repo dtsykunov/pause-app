@@ -11,6 +11,13 @@
     <string name="section_length">Pause length</string>
     <string name="section_message">Message</string>
     <string name="section_apps">Paused apps</string>
+    <string name="search_apps">Search apps</string>
+    <string name="no_matches">No apps match your search</string>
+
+    <plurals name="paused_count">
+        <item quantity="one">%d app paused</item>
+        <item quantity="other">%d apps paused</item>
+    </plurals>
 
     <string name="duration_value">%1$d seconds</string>
     <string name="show_timer">Show countdown</string>
@@ -28,6 +35,7 @@
     <string name="view_stats">Stats</string>
     <string name="stats_title">Stats</string>
     <string name="stats_subtitle">Per app, all time</string>
+    <string name="breathing_total">%1$s spent breathing</string>
     <string name="stat_details">Shown %1$d · Opened %2$d · Cancelled %3$d</string>
     <string name="stats_empty">No pauses yet. They\'ll show up here once you open a paused app.</string>
     <string name="reset_stats">Reset stats</string>
