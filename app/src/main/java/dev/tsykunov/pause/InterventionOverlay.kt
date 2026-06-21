@@ -2,6 +2,7 @@ package dev.tsykunov.pause
 
 import android.accessibilityservice.AccessibilityService
 import android.graphics.PixelFormat
+import android.view.ContextThemeWrapper
 import android.os.CountDownTimer
 import android.view.Gravity
 import android.view.KeyEvent
@@ -28,7 +29,10 @@ class InterventionOverlay(
     private val onClose: () -> Unit,
 ) {
     private val wm = service.getSystemService(AccessibilityService.WINDOW_SERVICE) as WindowManager
-    private val binding = OverlayInterventionBinding.inflate(LayoutInflater.from(service))
+    // Material widgets require a Material theme on the inflating context; the bare service
+    // context has none, so wrap it in the app theme.
+    private val themedContext = ContextThemeWrapper(service, R.style.Theme_Pause)
+    private val binding = OverlayInterventionBinding.inflate(LayoutInflater.from(themedContext))
 
     var isShowing = false
         private set
