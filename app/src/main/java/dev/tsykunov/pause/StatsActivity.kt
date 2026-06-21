@@ -33,6 +33,8 @@ class StatsActivity : AppCompatActivity() {
     private fun render() {
         binding.breathingTotal.text =
             getString(R.string.breathing_total, formatDuration(Prefs.totalBreathingMs(this)))
+        binding.statsTotals.text =
+            getString(R.string.stats_totals, Prefs.totalOpens(this), Prefs.totalCancels(this))
 
         val container = binding.statsContainer
         container.removeAllViews()

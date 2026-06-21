@@ -57,7 +57,7 @@ object Prefs {
         sp(c).edit().putString(KEY_PHRASE, phrase).apply()
     }
 
-    fun showTimer(c: Context): Boolean = sp(c).getBoolean(KEY_SHOW_TIMER, true)
+    fun showTimer(c: Context): Boolean = sp(c).getBoolean(KEY_SHOW_TIMER, false)
 
     fun setShowTimer(c: Context, show: Boolean) {
         sp(c).edit().putBoolean(KEY_SHOW_TIMER, show).apply()
@@ -69,6 +69,13 @@ object Prefs {
     fun setAllowMinutes(c: Context, minutes: Int) {
         sp(c).edit().putInt(KEY_ALLOW_MIN, minutes).apply()
     }
+
+    /** When [pkg] was last opened (its most recent recorded attempt), or null if never. */
+    fun lastAccessedAt(c: Context, pkg: String): Long? =
+        (sp(c).getString(ATTEMPTS_PREFIX + pkg, "") ?: "")
+            .split(',')
+            .mapNotNull { it.toLongOrNull() }
+            .maxOrNull()
 
     /** Record an open attempt for [pkg] and return the number of attempts in the last 24h. */
     fun recordAttempt(c: Context, pkg: String): Int {
@@ -124,6 +131,14 @@ object Prefs {
     fun totalBreathingMs(c: Context): Long =
         statPackages(c).sumOf { sp(c).getLong(STAT_BREATH_MS + it, 0L) }
 
+    /** Total "Open anyway" taps across all apps. */
+    fun totalOpens(c: Context): Int =
+        statPackages(c).sumOf { sp(c).getInt(STAT_OPENS + it, 0) }
+
+    /** Total "Cancel" taps across all apps. */
+    fun totalCancels(c: Context): Int =
+        statPackages(c).sumOf { sp(c).getInt(STAT_CANCELS + it, 0) }
+
     /** Stats for every app that has any recorded activity. */
     fun allStats(c: Context): List<AppStat> = statPackages(c).map { pkg ->
         AppStat(
@@ -141,6 +156,8 @@ object Prefs {
             edit.remove(STAT_OPENS + pkg)
             edit.remove(STAT_CANCELS + pkg)
             edit.remove(STAT_BREATH_MS + pkg)
+            // Also clear the 24h open history that the pause screen counts from.
+            edit.remove(ATTEMPTS_PREFIX + pkg)
         }
         edit.remove(KEY_STAT_PKGS).apply()
     }
