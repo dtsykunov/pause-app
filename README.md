@@ -6,7 +6,7 @@ selected app, the screen is covered by a panel with a countdown; only after it f
 last 24 hours and when you last opened it.
 
 It uses an Accessibility Service to detect app launches and an accessibility overlay to draw the pause
-screen — no "draw over other apps" permission, and the app has no network access.
+screen, so it needs no "draw over other apps" permission, and the app has no network access.
 
 > **Check your phone first.** Recent Android versions include this natively: Digital Wellbeing's app
 > timers and Focus mode, and Android 17's Pause Point (a built-in delay before selected apps, on Pixel
@@ -39,17 +39,21 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ## How it works
 
-- `AppMonitorService` — accessibility service; reacts to foreground-app changes and triggers the
+- `AppMonitorService`: accessibility service; reacts to foreground-app changes and triggers the
   overlay for paused apps. A configurable per-app allow-window (default 5 min) after "Open anyway"
   avoids re-prompting that app during its session.
-- `InterventionOverlay` — the full-screen cover: it covers the screen immediately, eases in a pulsing
+- `InterventionOverlay`: the full-screen cover. It covers the screen immediately, eases in a pulsing
   circle and countdown, then reveals the choice buttons; it slides back down on dismiss.
-- `Prefs` — stores the paused-app set, pause length, the rolling 24h list of open attempts, and the
+- `Prefs`: stores the paused-app set, pause length, the rolling 24h list of open attempts, and the
   per-app stats.
-- `MainActivity` / `AppsActivity` / `StatsActivity` — settings (accessibility status, pause length,
+- `MainActivity` / `AppsActivity` / `StatsActivity`: settings (accessibility status, pause length,
   message, allow-window), the searchable app picker, and per-app stats.
 
-Note: an accessibility-based gate is best-effort, not a hard block — it's designed to make impulsive
+Note: an accessibility-based gate is best-effort, not a hard block. It's designed to make impulsive
 opens deliberate, not to be tamper-proof.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
 </content>
 </invoke>

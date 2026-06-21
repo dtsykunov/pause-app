@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://dtsykunov.github.io/pause-and-think-app/sitemap.xml
+Sitemap: https://dtsykunov.github.io/pause-app/sitemap.xml
