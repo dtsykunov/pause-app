@@ -23,6 +23,10 @@
     <string name="show_timer">Show countdown</string>
     <string name="show_timer_hint">A visible number can make you wait it out</string>
     <string name="phrase_hint">Shown during the pause</string>
+    <string name="save">Save</string>
+    <string name="message_saved">Message saved</string>
+    <string name="section_allow">After Open anyway</string>
+    <string name="allow_value">Skip the pause for %1$d min</string>
     <string name="loading">Loading apps…</string>
 
     <string name="overlay_opening">Opening %1$s</string>

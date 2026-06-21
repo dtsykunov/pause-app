@@ -183,6 +183,41 @@
             android:maxLines="2" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/saveMessageButton"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="8dp"
+        android:minHeight="48dp"
+        android:text="@string/save" />
+
+    <!-- Allow window after Open anyway -->
+    <TextView
+        style="@style/Eyebrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/section_allow" />
+
+    <TextView
+        android:id="@+id/allowLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="@color/text_primary"
+        android:textSize="20sp" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/allowSlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stepSize="1"
+        android:valueFrom="1"
+        android:valueTo="60"
+        app:tickVisible="false" />
+
     <!-- Paused apps (opens the full, searchable list) -->
     <LinearLayout
         android:id="@+id/pausedAppsRow"

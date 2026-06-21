@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.provider.Settings
 import android.text.TextUtils
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import dev.tsykunov.pause.databinding.ActivityMainBinding
@@ -50,6 +52,26 @@ class MainActivity : AppCompatActivity() {
         binding.phraseInput.doAfterTextChanged {
             Prefs.setPhrase(this, it?.toString().orEmpty())
         }
+        binding.saveMessageButton.setOnClickListener {
+            Prefs.setPhrase(this, binding.phraseInput.text?.toString().orEmpty())
+            binding.phraseInput.clearFocus()
+            hideKeyboard()
+            Toast.makeText(this, R.string.message_saved, Toast.LENGTH_SHORT).show()
+        }
+
+        val allow = Prefs.allowMinutes(this).coerceIn(Prefs.MIN_ALLOW_MIN, Prefs.MAX_ALLOW_MIN)
+        binding.allowSlider.value = allow.toFloat()
+        binding.allowLabel.text = getString(R.string.allow_value, allow)
+        binding.allowSlider.addOnChangeListener { _, value, _ ->
+            val minutes = value.toInt()
+            binding.allowLabel.text = getString(R.string.allow_value, minutes)
+            Prefs.setAllowMinutes(this, minutes)
+        }
+    }
+
+    private fun hideKeyboard() {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.phraseInput.windowToken, 0)
     }
 
     override fun onResume() {
