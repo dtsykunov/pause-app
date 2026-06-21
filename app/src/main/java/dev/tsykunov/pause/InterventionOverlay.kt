@@ -24,7 +24,7 @@ class InterventionOverlay(
     private val service: AccessibilityService,
     private val appLabel: String,
     private val attempts: Int,
-    private val lastAccessedAt: Long?,
+    private val lastOpenedAt: Long?,
     private val seconds: Int,
     private val phrase: String,
     private val showTimer: Boolean,
@@ -87,7 +87,7 @@ class InterventionOverlay(
         } else {
             binding.root.context.getString(R.string.overlay_attempts_many, attempts)
         }
-        val sinceLast = lastAccessedAt?.let { System.currentTimeMillis() - it }?.takeIf { it >= 0 }
+        val sinceLast = lastOpenedAt?.let { System.currentTimeMillis() - it }?.takeIf { it >= 0 }
         if (sinceLast != null) {
             binding.lastOpenedText.text =
                 binding.root.context.getString(R.string.overlay_last_opened, formatAgo(sinceLast))

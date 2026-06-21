@@ -82,11 +82,10 @@ class AppMonitorService : AccessibilityService() {
         // The allow-window is strictly per app: Open anyway only skips the pause for that app.
         if (now < (allowedUntil[active] ?: 0L)) return
 
-        // Read the previous access before recording this one.
-        val lastAccessedAt = Prefs.lastAccessedAt(this, active)
+        val lastOpenedAt = Prefs.lastOpenedAt(this, active)
         val attempts = Prefs.recordAttempt(this, active)
         Prefs.incInterruptions(this, active)
-        showOverlay(active, attempts, lastAccessedAt, Prefs.pauseSeconds(this), Prefs.phrase(this), Prefs.showTimer(this))
+        showOverlay(active, attempts, lastOpenedAt, Prefs.pauseSeconds(this), Prefs.phrase(this), Prefs.showTimer(this))
     }
 
     private fun allowWindowMs(): Long = Prefs.allowMinutes(this) * 60_000L
@@ -102,13 +101,13 @@ class AppMonitorService : AccessibilityService() {
             ?.substringBefore('/')
             ?.takeIf { it.isNotEmpty() }
 
-    private fun showOverlay(pkg: String, attempts: Int, lastAccessedAt: Long?, seconds: Int, phrase: String, showTimer: Boolean) {
+    private fun showOverlay(pkg: String, attempts: Int, lastOpenedAt: Long?, seconds: Int, phrase: String, showTimer: Boolean) {
         val shownAt = SystemClock.elapsedRealtime()
         overlay = InterventionOverlay(
             service = this,
             appLabel = appLabel(pkg),
             attempts = attempts,
-            lastAccessedAt = lastAccessedAt,
+            lastOpenedAt = lastOpenedAt,
             seconds = seconds,
             phrase = phrase,
             showTimer = showTimer,

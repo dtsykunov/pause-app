@@ -16,6 +16,7 @@ object Prefs {
     private const val STAT_OPENS = "so_"
     private const val STAT_CANCELS = "sc_"
     private const val STAT_BREATH_MS = "bms_"
+    private const val STAT_LAST_OPEN = "slo_"
     private const val ATTEMPTS_PREFIX = "attempts_"
     private const val WINDOW_MS = 24L * 60 * 60 * 1000
 
@@ -70,12 +71,9 @@ object Prefs {
         sp(c).edit().putInt(KEY_ALLOW_MIN, minutes).apply()
     }
 
-    /** When [pkg] was last opened (its most recent recorded attempt), or null if never. */
-    fun lastAccessedAt(c: Context, pkg: String): Long? =
-        (sp(c).getString(ATTEMPTS_PREFIX + pkg, "") ?: "")
-            .split(',')
-            .mapNotNull { it.toLongOrNull() }
-            .maxOrNull()
+    /** When [pkg] was last actually opened (via "Open anyway"), or null if never. */
+    fun lastOpenedAt(c: Context, pkg: String): Long? =
+        sp(c).getLong(STAT_LAST_OPEN + pkg, 0L).takeIf { it > 0 }
 
     /** Record an open attempt for [pkg] and return the number of attempts in the last 24h. */
     fun recordAttempt(c: Context, pkg: String): Int {
@@ -113,8 +111,12 @@ object Prefs {
     }
 
     fun incInterruptions(c: Context, pkg: String) = inc(c, STAT_INTERRUPTIONS, pkg)
-    fun incOpens(c: Context, pkg: String) = inc(c, STAT_OPENS, pkg)
     fun incCancels(c: Context, pkg: String) = inc(c, STAT_CANCELS, pkg)
+
+    fun incOpens(c: Context, pkg: String) {
+        inc(c, STAT_OPENS, pkg)
+        sp(c).edit().putLong(STAT_LAST_OPEN + pkg, System.currentTimeMillis()).apply()
+    }
 
     /** Add the time the pause screen was shown for [pkg], in milliseconds. */
     fun addBreathingMs(c: Context, pkg: String, ms: Long) {
@@ -156,6 +158,7 @@ object Prefs {
             edit.remove(STAT_OPENS + pkg)
             edit.remove(STAT_CANCELS + pkg)
             edit.remove(STAT_BREATH_MS + pkg)
+            edit.remove(STAT_LAST_OPEN + pkg)
             // Also clear the 24h open history that the pause screen counts from.
             edit.remove(ATTEMPTS_PREFIX + pkg)
         }
