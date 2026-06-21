@@ -143,6 +143,19 @@
     </section>
 
     <section>
+      <h2>Heads up: it needs accessibility access</h2>
+      <p>Pause works through Android's Accessibility Service, which it uses to notice when one of your
+      chosen apps comes to the foreground. This is a powerful permission, and granting it is a real
+      decision: an accessibility service is technically capable of reading on-screen content. If that's
+      a dealbreaker for you, that's a fair call.</p>
+      <p>What Pause does with it: it only checks which app is in the foreground so it can show the
+      pause. Everything stays on your phone, the app has no network access, and the
+      <a class="inline" href="https://github.com/dtsykunov/pause-app">source is public</a>, so you can
+      verify exactly what it does. If you'd rather not grant accessibility access, check whether your
+      phone already offers a built-in pause first.</p>
+    </section>
+
+    <section>
       <h2>Check your phone first</h2>
       <p>Many recent Android phones already do this. Android's
       <a class="inline" href="https://www.android.com/digital-wellbeing/">Digital Wellbeing</a>
