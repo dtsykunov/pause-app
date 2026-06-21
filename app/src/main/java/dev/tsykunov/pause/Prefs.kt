@@ -10,6 +10,7 @@ object Prefs {
     private const val KEY_DURATION = "pause_seconds"
     private const val KEY_PHRASE = "pause_phrase"
     private const val KEY_SHOW_TIMER = "show_timer"
+    private const val KEY_ALLOW_MIN = "allow_minutes"
     private const val KEY_STAT_PKGS = "stat_packages"
     private const val STAT_INTERRUPTIONS = "si_"
     private const val STAT_OPENS = "so_"
@@ -22,6 +23,9 @@ object Prefs {
     const val MIN_DURATION = 3
     const val MAX_DURATION = 30
     const val DEFAULT_PHRASE = "Breathe"
+    const val DEFAULT_ALLOW_MIN = 5
+    const val MIN_ALLOW_MIN = 1
+    const val MAX_ALLOW_MIN = 60
 
     private fun sp(c: Context): SharedPreferences =
         c.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -57,6 +61,13 @@ object Prefs {
 
     fun setShowTimer(c: Context, show: Boolean) {
         sp(c).edit().putBoolean(KEY_SHOW_TIMER, show).apply()
+    }
+
+    /** Minutes after "Open anyway" during which the app won't be paused again. */
+    fun allowMinutes(c: Context): Int = sp(c).getInt(KEY_ALLOW_MIN, DEFAULT_ALLOW_MIN)
+
+    fun setAllowMinutes(c: Context, minutes: Int) {
+        sp(c).edit().putInt(KEY_ALLOW_MIN, minutes).apply()
     }
 
     /** Record an open attempt for [pkg] and return the number of attempts in the last 24h. */
