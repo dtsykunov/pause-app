@@ -20,8 +20,8 @@ import android.view.accessibility.AccessibilityEvent
  * navigation, back gestures, recents, dialogs, and apps being backgrounded. So we never act on
  * the raw event: after a short settle we read the real active window ([rootInActiveWindow]),
  * ignore transient/system windows, and only react when the *confirmed* foreground app actually
- * changes to a different real app. An allow-window after "Open anyway" (and inherited by apps
- * launched from an allowed one, e.g. links opening a browser) prevents nagging during a session.
+ * changes to a different real app. A per-app allow-window after "Open anyway" prevents nagging
+ * during that app's session.
  */
 class AppMonitorService : AccessibilityService() {
 
@@ -73,21 +73,14 @@ class AppMonitorService : AccessibilityService() {
         if (isTransientWindow(active)) return // system UI, keyboard, our own overlay
         if (active == currentApp) return      // same app: in-app nav, keyboard toggle, dialog, back
 
-        val previous = currentApp
         currentApp = active
 
         if (overlay?.isShowing == true) return
         if (!Prefs.isBlocked(this, active)) return
 
         val now = System.currentTimeMillis()
-        if (now < (allowedUntil[active] ?: 0L)) return // still within this app's allow window
-
-        // Arriving directly from an app that's currently allowed (e.g. a link opening a browser
-        // or custom tab, or a share sheet): treat it as part of that session, don't pause.
-        if (previous != null && now < (allowedUntil[previous] ?: 0L)) {
-            allowedUntil[active] = now + allowWindowMs()
-            return
-        }
+        // The allow-window is strictly per app: Open anyway only skips the pause for that app.
+        if (now < (allowedUntil[active] ?: 0L)) return
 
         val attempts = Prefs.recordAttempt(this, active)
         Prefs.incInterruptions(this, active)
