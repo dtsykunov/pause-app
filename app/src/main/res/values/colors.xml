@@ -1,18 +1,18 @@
 <resources>
-    <!-- Core palette: a calm night ground with a single breath-teal accent. -->
-    <color name="night">#0E141B</color>
-    <color name="panel">#161F29</color>
-    <color name="panel_variant">#1C2731</color>
-    <color name="breath">#5BC0BE</color>
-    <color name="breath_container">#22383A</color>
-    <color name="text_primary">#EAF0F2</color>
-    <color name="text_dim">#8A99A6</color>
-    <color name="outline">#2A3742</color>
+    <!-- Core palette: soft light lavender ground with a single breath-violet accent. -->
+    <color name="night">#F5F0FC</color>
+    <color name="panel">#EDE6F8</color>
+    <color name="panel_variant">#E3D9F4</color>
+    <color name="breath">#7260A8</color>
+    <color name="breath_container">#D5CCEE</color>
+    <color name="text_primary">#2B2442</color>
+    <color name="text_dim">#6A6080</color>
+    <color name="outline">#C4BAE0</color>
 
     <!-- Pause overlay -->
-    <color name="overlay_bg">#0E141B</color>
-    <color name="overlay_circle">#5BC0BE</color>
-    <color name="overlay_text">#EAF0F2</color>
-    <color name="overlay_text_dim">#8A99A6</color>
-    <color name="overlay_countdown">#0E141B</color>
+    <color name="overlay_bg">#F5F0FC</color>
+    <color name="overlay_circle">#7260A8</color>
+    <color name="overlay_text">#2B2442</color>
+    <color name="overlay_text_dim">#6A6080</color>
+    <color name="overlay_countdown">#F5F0FC</color>
 </resources>

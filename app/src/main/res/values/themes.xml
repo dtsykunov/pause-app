@@ -17,7 +17,7 @@
         <item name="colorOutlineVariant">@color/outline</item>
         <item name="android:statusBarColor">@color/night</item>
         <item name="android:navigationBarColor">@color/night</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <!-- Small tracked, uppercase section labels. -->
