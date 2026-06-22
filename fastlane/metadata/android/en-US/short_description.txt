@@ -1,0 +1,1 @@
+A short, timed pause before chosen apps open, so opening is deliberate.

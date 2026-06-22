@@ -1,0 +1,1 @@
+First F-Droid release. Reproducible builds, so F-Droid ships the developer-signed APK. No functional changes from 0.1.1.

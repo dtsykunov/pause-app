@@ -23,8 +23,8 @@ android {
         applicationId = "dev.tsykunov.pause"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
-        versionName = "0.1.1"
+        versionCode = 3
+        versionName = "0.1.2"
     }
 
     signingConfigs {
