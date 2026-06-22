@@ -104,6 +104,31 @@
     .feature h3 { margin: 0 0 4px; font-size: 1.05rem; font-weight: 600; }
     .feature p { margin: 0; color: var(--dim); }
 
+    /* Screenshots: a quiet horizontal filmstrip, scrolls on narrow screens. */
+    .shots {
+      display: flex; gap: 16px; overflow-x: auto;
+      padding-bottom: 10px; scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .shots a.shot { flex: 0 0 auto; line-height: 0; cursor: zoom-in; scroll-snap-align: center; }
+    .shots img {
+      height: 440px; width: auto; display: block;
+      border-radius: 20px; border: 1px solid var(--outline);
+    }
+    h2 .hint { text-transform: none; letter-spacing: 0; font-weight: 500; opacity: 0.7; margin-left: 8px; }
+
+    /* CSS-only lightbox for viewing a screenshot up close. */
+    .lightbox {
+      position: fixed; inset: 0; z-index: 50; display: none;
+      align-items: center; justify-content: center; padding: 28px;
+      background: rgba(43, 36, 66, 0.88); cursor: zoom-out;
+    }
+    .lightbox:target { display: flex; }
+    .lightbox img {
+      max-width: 100%; max-height: 100%; width: auto; height: auto;
+      border-radius: 16px; box-shadow: 0 16px 56px rgba(0, 0, 0, 0.45);
+    }
+
     ol.steps { margin: 0; padding-left: 1.2em; }
     ol.steps li { margin-bottom: 10px; }
     ol.steps li::marker { color: var(--breath); }
@@ -128,6 +153,22 @@
       <h2>What it does</h2>
       <p>When you open an app you've chosen, Pause covers the screen with a short countdown before you
       can continue, so you open on purpose, or back out. It's friction, not a hard block.</p>
+    </section>
+
+    <section id="screenshots">
+      <h2>Screenshots <span class="hint">tap to enlarge</span></h2>
+      <div class="shots">
+        <a class="shot" href="#shot-1"><img src="screenshots/overlay.png" width="198" height="440" loading="lazy" alt="The pause screen: a countdown before a chosen app opens" /></a>
+        <a class="shot" href="#shot-2"><img src="screenshots/settings.png" width="198" height="440" loading="lazy" alt="Settings: pause length, message, and skip window" /></a>
+        <a class="shot" href="#shot-3"><img src="screenshots/apps.png" width="198" height="440" loading="lazy" alt="Choosing which apps to pause" /></a>
+        <a class="shot" href="#shot-4"><img src="screenshots/stats.png" width="198" height="440" loading="lazy" alt="Per-app stats and total time paused" /></a>
+      </div>
+
+      <!-- CSS-only lightboxes: clicking a thumbnail targets one of these; clicking it again closes. -->
+      <a id="shot-1" class="lightbox" href="#screenshots"><img src="screenshots/overlay.png" alt="The pause screen: a countdown before a chosen app opens" /></a>
+      <a id="shot-2" class="lightbox" href="#screenshots"><img src="screenshots/settings.png" alt="Settings: pause length, message, and skip window" /></a>
+      <a id="shot-3" class="lightbox" href="#screenshots"><img src="screenshots/apps.png" alt="Choosing which apps to pause" /></a>
+      <a id="shot-4" class="lightbox" href="#screenshots"><img src="screenshots/stats.png" alt="Per-app stats and total time paused" /></a>
     </section>
 
     <section>

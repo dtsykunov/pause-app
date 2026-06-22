@@ -13,6 +13,15 @@ screen, so it needs no "draw over other apps" permission, and the app has no net
 > and Samsung). If your phone has those, prefer them. Pause is for older devices, custom ROMs, and
 > phones that ship without Google's Digital Wellbeing.
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/overlay.png" width="200" alt="The pause screen: a countdown before a chosen app opens" />
+  <img src="docs/screenshots/settings.png" width="200" alt="Settings: pause length, message, and skip window" />
+  <img src="docs/screenshots/apps.png" width="200" alt="Choosing which apps to pause" />
+  <img src="docs/screenshots/stats.png" width="200" alt="Per-app stats and total time paused" />
+</p>
+
 ## Build
 
 ```sh
