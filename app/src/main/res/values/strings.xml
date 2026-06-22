@@ -30,7 +30,7 @@
     <string name="help">Explain this option</string>
     <string name="got_it">Got it</string>
     <string name="help_length_body">How long the pause screen stays before you can continue. The “Open anyway” button only appears once this time is up.</string>
-    <string name="help_allow_body">After you tap “Open anyway” for an app, Pause won\'t interrupt that app again for this many minutes, so you can use it without repeated pauses. It applies only to that one app.</string>
+    <string name="help_allow_body">After you tap “Open anyway”, Pause won\'t interrupt opening that app for this many minutes. Applies to that one app only. Pause never closes an app while you\'re using it.</string>
     <string name="loading">Loading apps…</string>
 
     <string name="overlay_opening">Opening %1$s</string>

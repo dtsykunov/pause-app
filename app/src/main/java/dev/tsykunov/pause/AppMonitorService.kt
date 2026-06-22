@@ -39,25 +39,56 @@ class AppMonitorService : AccessibilityService() {
 
     private val keyguard by lazy { getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager }
 
-    private val screenOffReceiver = object : BroadcastReceiver() {
+    private val powerReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            // A pause shouldn't linger on the lock screen.
-            cancelPending()
-            overlay?.dismissNow()
-            overlay = null
+            when (intent?.action) {
+                // A pause shouldn't linger on the lock screen.
+                Intent.ACTION_SCREEN_OFF -> {
+                    cancelPending()
+                    overlay?.dismissNow()
+                    overlay = null
+                }
+                // Waking back into an app counts as reopening it: re-confirm the foreground
+                // so an expired "Open anyway" window pauses again. Clearing currentApp makes
+                // the same app read as a fresh foreground. SCREEN_ON covers no-lock devices;
+                // USER_PRESENT covers unlock on secure ones. A redundant double-fire is
+                // harmless (evaluateForeground returns while the keyguard is still locked).
+                Intent.ACTION_SCREEN_ON, Intent.ACTION_USER_PRESENT -> {
+                    currentApp = null
+                    cancelPending()
+                    val check = Runnable { evaluateForeground() }
+                    pendingCheck = check
+                    handler.postDelayed(check, settleDelayMs)
+                }
+            }
         }
     }
 
     override fun onServiceConnected() {
         super.onServiceConnected()
-        registerReceiver(screenOffReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF))
+        registerReceiver(powerReceiver, IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(Intent.ACTION_SCREEN_ON)
+            addAction(Intent.ACTION_USER_PRESENT)
+        })
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null || event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
         val pkg = event.packageName?.toString() ?: return
         if (pkg == packageName) return
-        if (overlay?.isShowing == true) return
+
+        // While the pause is up, a move to any real window other than the paused app (home,
+        // recents, another app) means the user navigated away with a system gesture. Just
+        // drop the pause and let that destination show: no stats, no forced home.
+        if (overlay?.isShowing == true) {
+            if (!isTransientWindow(pkg) && pkg != currentApp) {
+                cancelPending()
+                overlay?.dismissNow()
+                overlay = null
+            }
+            return
+        }
 
         // Debounce, then confirm against the real active window.
         cancelPending()
@@ -155,7 +186,7 @@ class AppMonitorService : AccessibilityService() {
 
     override fun onDestroy() {
         try {
-            unregisterReceiver(screenOffReceiver)
+            unregisterReceiver(powerReceiver)
         } catch (_: Exception) {
         }
         super.onDestroy()
