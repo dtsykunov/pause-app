@@ -1,0 +1,114 @@
+name: F-Droid reproducible build check
+
+# Reproduces the release the way F-Droid's build server does, inside F-Droid's own
+# docker image, then verifies (via apksigcopier) that the rebuild is byte-identical to
+# the published, developer-signed APK. If this passes, F-Droid can ship our signature.
+#
+# Runs after a GitHub Release is published (the release.yml workflow builds and uploads
+# pause-<tag>.apk first), or manually against any tag. It can only succeed once the
+# release asset exists, so the trigger is `release: published`, not the tag push.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Git tag to verify (e.g. v0.1.2)
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  fdroid-verify:
+    runs-on: ubuntu-latest
+    container:
+      # F-Droid's build environment: Debian + Android SDK + Java + gradlew-fdroid.
+      image: registry.gitlab.com/fdroid/fdroidserver:buildserver
+    env:
+      APP_ID: dev.tsykunov.pause
+      REPO_URL: https://github.com/${{ github.repository }}
+      # SHA-256 of our release signing certificate (CN=Pause). F-Droid uses this to
+      # confirm the published APK is ours before copying its signature onto the rebuild.
+      SIGNING_KEY_SHA256: 8b1eb432e3465d1ece5dfa68f5a8c5ac3fe4c9e63442dd28dba5149eeffe42b8
+    steps:
+      - name: Resolve tag
+        env:
+          EVENT_TAG: ${{ github.event.release.tag_name }}
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          TAG="${EVENT_TAG:-$INPUT_TAG}"
+          # Guard the value before it reaches `checkout ref:` / shell.
+          if ! printf '%s' "$TAG" | grep -qE '^v?[0-9][0-9A-Za-z._-]*$'; then
+            echo "Refusing suspicious tag: '$TAG'"; exit 1
+          fi
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+
+      - name: Check out source at tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+          path: src
+
+      - name: Install fdroidserver
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends fdroidserver unzip
+          fdroid --version
+
+      - name: Install SDK packages F-Droid uses
+        run: yes | sdkmanager "platforms;android-34" "build-tools;34.0.0" > /dev/null
+
+      - name: Assemble fdroiddata workspace
+        run: |
+          set -euo pipefail
+          git config --global --add safe.directory '*'
+
+          # Read the version this tag actually declares, so the metadata matches.
+          VNAME=$(grep -oP 'versionName\s*=\s*"\K[^"]+' src/app/build.gradle.kts)
+          VCODE=$(grep -oP 'versionCode\s*=\s*\K[0-9]+' src/app/build.gradle.kts)
+          echo "VCODE=$VCODE" >> "$GITHUB_ENV"
+          echo "Verifying $APP_ID $VNAME ($VCODE) at tag $TAG"
+
+          WORK="$RUNNER_TEMP/fdroiddata"
+          mkdir -p "$WORK/metadata"
+          echo "WORK=$WORK" >> "$GITHUB_ENV"
+
+          printf 'sdk_path: %s\n' "${ANDROID_HOME:-/opt/android-sdk}" > "$WORK/config.yml"
+
+          cat > "$WORK/metadata/${APP_ID}.yml" <<EOF
+          Categories:
+            - Time
+          License: MIT
+          SourceCode: ${REPO_URL}
+          IssueTracker: ${REPO_URL}/issues
+
+          RepoType: git
+          Repo: ${REPO_URL}
+
+          Builds:
+            - versionName: ${VNAME}
+              versionCode: ${VCODE}
+              commit: ${TAG}
+              subdir: app
+              gradle:
+                - yes
+              binary: ${REPO_URL}/releases/download/${TAG}/pause-${TAG}.apk
+
+          AllowedAPKSigningKeys: ${SIGNING_KEY_SHA256}
+          EOF
+
+          # fdroid derives SOURCE_DATE_EPOCH from the metadata file's commit, so the
+          # workspace must be a git repo (real fdroiddata is one).
+          git -C "$WORK" init -q
+          git -C "$WORK" -c user.email=ci@example.com -c user.name=ci commit -qam init || \
+            git -C "$WORK" -c user.email=ci@example.com -c user.name=ci -c commit.gpgsign=false commit -q --allow-empty -m init
+
+      - name: fdroid build (reproduce from source)
+        working-directory: ${{ env.WORK }}
+        run: fdroid build -v "${APP_ID}:${VCODE}"
+
+      - name: fdroid verify (compare against published APK)
+        working-directory: ${{ env.WORK }}
+        run: fdroid verify -v "${APP_ID}:${VCODE}"
