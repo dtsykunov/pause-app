@@ -1,6 +1,7 @@
 package dev.tsykunov.pause
 
 import android.accessibilityservice.AccessibilityService
+import android.content.Context
 import android.graphics.PixelFormat
 import android.view.ContextThemeWrapper
 import android.os.CountDownTimer
@@ -24,6 +25,7 @@ class InterventionOverlay(
     private val service: AccessibilityService,
     private val appLabel: String,
     private val attempts: Int,
+    private val cancels: Int,
     private val lastOpenedAt: Long?,
     private val seconds: Int,
     private val phrase: String,
@@ -83,18 +85,34 @@ class InterventionOverlay(
         binding.openingText.text =
             binding.root.context.getString(R.string.overlay_opening, appLabel)
         val ctx = binding.root.context
+        val prev = (attempts - 1).coerceAtLeast(0)
         val sinceLast = lastOpenedAt?.let { System.currentTimeMillis() - it }?.takeIf { it >= 0 }
-        binding.attemptsText.text = when {
-            sinceLast != null && attempts <= 1 ->
-                ctx.getString(R.string.overlay_last_opened_one, formatAgo(sinceLast))
-            sinceLast != null ->
-                ctx.getString(R.string.overlay_last_opened_many, formatAgo(sinceLast), attempts)
-            attempts <= 1 -> ctx.getString(R.string.overlay_attempts_one)
-            else -> ctx.getString(R.string.overlay_attempts_many, attempts)
+        val hint = buildHint(ctx, prev, cancels, sinceLast)
+        if (hint == null) {
+            binding.attemptsText.visibility = View.GONE
+        } else {
+            binding.attemptsText.visibility = View.VISIBLE
+            binding.attemptsText.text = hint
         }
         binding.countdownText.text = seconds.toString()
         binding.countdownText.visibility = if (showTimer) View.VISIBLE else View.GONE
         binding.breatheText.text = phrase
+    }
+
+    private fun buildHint(ctx: Context, prev: Int, cancels: Int, sinceLast: Long?): String? {
+        val lastPart = sinceLast?.let { ctx.getString(R.string.overlay_hint_last_opened, formatAgo(it)) }
+        return when {
+            prev == 0 -> lastPart
+            cancels == 0 -> {
+                val part = ctx.resources.getQuantityString(R.plurals.overlay_hint_attempts_today, prev, prev)
+                if (lastPart != null) "$lastPart · $part" else part
+            }
+            else -> {
+                val part = ctx.resources.getQuantityString(R.plurals.overlay_hint_cancelled_of, prev, cancels, prev)
+                if (lastPart != null) "$lastPart · $part"
+                else part.replaceFirstChar { it.uppercaseChar() }
+            }
+        }
     }
 
     /** Compact elapsed time for "Last opened … ago": "45s", "10m", "3h", "2d". */

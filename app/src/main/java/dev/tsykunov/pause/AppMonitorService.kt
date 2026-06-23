@@ -115,8 +115,9 @@ class AppMonitorService : AccessibilityService() {
 
         val lastOpenedAt = Prefs.lastOpenedAt(this, active)
         val attempts = Prefs.recordAttempt(this, active)
+        val cancels = Prefs.cancelsInWindow(this, active)
         Prefs.incInterruptions(this, active)
-        showOverlay(active, attempts, lastOpenedAt, Prefs.pauseSeconds(this), Prefs.phrase(this), Prefs.showTimer(this))
+        showOverlay(active, attempts, cancels, lastOpenedAt, Prefs.pauseSeconds(this), Prefs.phrase(this), Prefs.showTimer(this))
     }
 
     private fun allowWindowMs(): Long = Prefs.allowMinutes(this) * 60_000L
@@ -132,12 +133,13 @@ class AppMonitorService : AccessibilityService() {
             ?.substringBefore('/')
             ?.takeIf { it.isNotEmpty() }
 
-    private fun showOverlay(pkg: String, attempts: Int, lastOpenedAt: Long?, seconds: Int, phrase: String, showTimer: Boolean) {
+    private fun showOverlay(pkg: String, attempts: Int, cancels: Int, lastOpenedAt: Long?, seconds: Int, phrase: String, showTimer: Boolean) {
         val shownAt = SystemClock.elapsedRealtime()
         overlay = InterventionOverlay(
             service = this,
             appLabel = appLabel(pkg),
             attempts = attempts,
+            cancels = cancels,
             lastOpenedAt = lastOpenedAt,
             seconds = seconds,
             phrase = phrase,
@@ -150,6 +152,7 @@ class AppMonitorService : AccessibilityService() {
             },
             onClose = {
                 Prefs.incCancels(this, pkg)
+                Prefs.recordCancel24h(this, pkg)
                 recordBreathing(pkg, shownAt, seconds)
                 overlay = null
                 performGlobalAction(GLOBAL_ACTION_HOME)

@@ -34,10 +34,15 @@
     <string name="loading">Loading apps…</string>
 
     <string name="overlay_opening">Opening %1$s</string>
-    <string name="overlay_attempts_one">Tried once in the last 24h</string>
-    <string name="overlay_attempts_many">Tried %1$d times in the last 24h</string>
-    <string name="overlay_last_opened_one">Last opened %1$s ago, tried once in the last 24h</string>
-    <string name="overlay_last_opened_many">Last opened %1$s ago, tried %2$d times in the last 24h</string>
+    <string name="overlay_hint_last_opened">Last opened %1$s ago</string>
+    <plurals name="overlay_hint_attempts_today">
+        <item quantity="one">%1$d attempt in the last 24h</item>
+        <item quantity="other">%1$d attempts in the last 24h</item>
+    </plurals>
+    <plurals name="overlay_hint_cancelled_of">
+        <item quantity="one">cancelled %1$d of %2$d attempt in the last 24h</item>
+        <item quantity="other">cancelled %1$d of %2$d attempts in the last 24h</item>
+    </plurals>
     <string name="overlay_breathe">Take a moment</string>
     <string name="overlay_open">Open anyway</string>
     <string name="overlay_close">Cancel</string>

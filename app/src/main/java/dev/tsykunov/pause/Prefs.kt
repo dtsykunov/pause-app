@@ -18,6 +18,7 @@ object Prefs {
     private const val STAT_BREATH_MS = "bms_"
     private const val STAT_LAST_OPEN = "slo_"
     private const val ATTEMPTS_PREFIX = "attempts_"
+    private const val CANCELS_WINDOW_PREFIX = "cancels24_"
     private const val WINDOW_MS = 24L * 60 * 60 * 1000
 
     const val DEFAULT_DURATION = 8
@@ -87,6 +88,28 @@ object Prefs {
         kept.add(now)
         sp(c).edit().putString(key, kept.joinToString(",")).apply()
         return kept.size
+    }
+
+    /** Cancel taps for [pkg] in the last 24h (read without recording). */
+    fun cancelsInWindow(c: Context, pkg: String): Int {
+        val now = System.currentTimeMillis()
+        return (sp(c).getString(CANCELS_WINDOW_PREFIX + pkg, "") ?: "")
+            .split(',')
+            .mapNotNull { it.toLongOrNull() }
+            .count { now - it < WINDOW_MS }
+    }
+
+    /** Record a cancel tap for [pkg] in the 24h window. */
+    fun recordCancel24h(c: Context, pkg: String) {
+        val now = System.currentTimeMillis()
+        val key = CANCELS_WINDOW_PREFIX + pkg
+        val kept = (sp(c).getString(key, "") ?: "")
+            .split(',')
+            .mapNotNull { it.toLongOrNull() }
+            .filter { now - it < WINDOW_MS }
+            .toMutableList()
+        kept.add(now)
+        sp(c).edit().putString(key, kept.joinToString(",")).apply()
     }
 
     // ---- Per-app lifetime stats ----
@@ -159,8 +182,9 @@ object Prefs {
             edit.remove(STAT_CANCELS + pkg)
             edit.remove(STAT_BREATH_MS + pkg)
             edit.remove(STAT_LAST_OPEN + pkg)
-            // Also clear the 24h open history that the pause screen counts from.
+            // Also clear the 24h open/cancel history that the pause screen counts from.
             edit.remove(ATTEMPTS_PREFIX + pkg)
+            edit.remove(CANCELS_WINDOW_PREFIX + pkg)
         }
         edit.remove(KEY_STAT_PKGS).apply()
     }
