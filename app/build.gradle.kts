@@ -25,6 +25,7 @@ android {
         targetSdk = 34
         versionCode = 5
         versionName = "0.1.4"
+        resourceConfigurations += listOf("en")
     }
 
     signingConfigs {
@@ -40,7 +41,12 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
             if (keystorePropsFile.exists()) {
                 signingConfig = signingConfigs.getByName("release")
             }
