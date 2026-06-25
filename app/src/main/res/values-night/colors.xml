@@ -1,0 +1,18 @@
+<resources>
+    <!-- Dark palette: deep indigo-purple brand -->
+    <color name="night">#1A1530</color>
+    <color name="panel">#241E3A</color>
+    <color name="panel_variant">#2E2848</color>
+    <color name="breath">#9B8DD4</color>
+    <color name="breath_container">#3D3560</color>
+    <color name="text_primary">#EDE9FA</color>
+    <color name="text_dim">#9A92B8</color>
+    <color name="outline">#4A4268</color>
+
+    <!-- Pause overlay -->
+    <color name="overlay_bg">#1A1530</color>
+    <color name="overlay_circle">#9B8DD4</color>
+    <color name="overlay_text">#EDE9FA</color>
+    <color name="overlay_text_dim">#9A92B8</color>
+    <color name="overlay_countdown">#1A1530</color>
+</resources>
