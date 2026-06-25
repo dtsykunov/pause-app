@@ -21,11 +21,11 @@ object Prefs {
     private const val CANCELS_WINDOW_PREFIX = "cancels24_"
     private const val WINDOW_MS = 24L * 60 * 60 * 1000
 
-    const val DEFAULT_DURATION = 8
+    const val DEFAULT_DURATION = 10
     const val MIN_DURATION = 3
     const val MAX_DURATION = 30
     const val DEFAULT_PHRASE = "Take a moment"
-    const val DEFAULT_ALLOW_MIN = 5
+    const val DEFAULT_ALLOW_MIN = 15
     const val MIN_ALLOW_MIN = 1
     const val MAX_ALLOW_MIN = 60
 
