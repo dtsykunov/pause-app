@@ -12,7 +12,7 @@ val keystoreProps = Properties().apply {
 }
 
 android {
-    namespace = "dev.tsykunov.pause"
+    namespace = "com.dtsykunov.pause"
     compileSdk = 34
     // Pinned to 34.0.0 so our release APK is signed with apksigner 34, which
     // F-Droid's apksigcopier can verify (build-tools 35+ apksigner cannot be
@@ -20,11 +20,11 @@ android {
     buildToolsVersion = "34.0.0"
 
     defaultConfig {
-        applicationId = "dev.tsykunov.pause"
+        applicationId = "com.dtsykunov.pause"
         minSdk = 24
         targetSdk = 34
-        versionCode = 8
-        versionName = "0.1.7"
+        versionCode = 9
+        versionName = "0.1.8"
         resourceConfigurations += listOf("en")
     }
 

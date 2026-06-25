@@ -1,12 +1,12 @@
-package dev.tsykunov.pause
+package com.dtsykunov.pause
 
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import dev.tsykunov.pause.databinding.ActivityStatsBinding
-import dev.tsykunov.pause.databinding.ItemStatBinding
+import com.dtsykunov.pause.databinding.ActivityStatsBinding
+import com.dtsykunov.pause.databinding.ItemStatBinding
 
 class StatsActivity : AppCompatActivity() {
 

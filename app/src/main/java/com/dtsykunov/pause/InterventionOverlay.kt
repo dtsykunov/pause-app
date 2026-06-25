@@ -1,4 +1,4 @@
-package dev.tsykunov.pause
+package com.dtsykunov.pause
 
 import android.accessibilityservice.AccessibilityService
 import android.graphics.PixelFormat
@@ -12,7 +12,7 @@ import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
-import dev.tsykunov.pause.databinding.OverlayInterventionBinding
+import com.dtsykunov.pause.databinding.OverlayInterventionBinding
 import kotlin.math.ceil
 
 /**

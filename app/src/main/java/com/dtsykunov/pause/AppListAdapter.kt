@@ -1,11 +1,11 @@
-package dev.tsykunov.pause
+package com.dtsykunov.pause
 
 import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import dev.tsykunov.pause.databinding.ItemAppBinding
+import com.dtsykunov.pause.databinding.ItemAppBinding
 
 data class AppEntry(
     val packageName: String,

@@ -27,7 +27,7 @@ jobs:
       # F-Droid's build environment: Debian + Android SDK + Java + gradlew-fdroid.
       image: registry.gitlab.com/fdroid/fdroidserver:buildserver
     env:
-      APP_ID: dev.tsykunov.pause
+      APP_ID: com.dtsykunov.pause
       REPO_URL: https://github.com/${{ github.repository }}
       # SHA-256 of our release signing certificate (CN=Pause). F-Droid uses this to
       # confirm the published APK is ours before copying its signature onto the rebuild.

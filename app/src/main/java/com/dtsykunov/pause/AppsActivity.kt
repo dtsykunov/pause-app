@@ -1,4 +1,4 @@
-package dev.tsykunov.pause
+package com.dtsykunov.pause
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -7,7 +7,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
-import dev.tsykunov.pause.databinding.ActivityAppsBinding
+import com.dtsykunov.pause.databinding.ActivityAppsBinding
 import kotlin.concurrent.thread
 
 /** The full list of launchable apps, searchable, where you choose which to pause. */

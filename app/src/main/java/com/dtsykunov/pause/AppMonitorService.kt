@@ -1,4 +1,4 @@
-package dev.tsykunov.pause
+package com.dtsykunov.pause
 
 import android.accessibilityservice.AccessibilityService
 import android.app.KeyguardManager

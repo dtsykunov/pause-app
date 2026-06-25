@@ -1,4 +1,4 @@
-package dev.tsykunov.pause
+package com.dtsykunov.pause
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.tsykunov.pause.databinding.ActivityMainBinding
+import com.dtsykunov.pause.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 

@@ -1,4 +1,4 @@
-package dev.tsykunov.pause
+package com.dtsykunov.pause
 
 import android.content.Context
 import android.content.SharedPreferences
