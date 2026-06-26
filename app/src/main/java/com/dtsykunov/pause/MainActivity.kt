@@ -1,14 +1,19 @@
 package com.dtsykunov.pause
 
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
 import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.dtsykunov.pause.databinding.ActivityMainBinding
 
@@ -24,6 +29,9 @@ class MainActivity : AppCompatActivity() {
         binding.accessButton.setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         }
+
+        binding.batteryButton.setOnClickListener { requestBatteryExemption() }
+        binding.batteryHelp.setOnClickListener { showBatteryHelp() }
 
         binding.statsButton.setOnClickListener {
             startActivity(Intent(this, StatsActivity::class.java))
@@ -95,13 +103,90 @@ class MainActivity : AppCompatActivity() {
         val enabled = isServiceEnabled()
         binding.statusText.text =
             getString(if (enabled) R.string.status_on else R.string.status_off)
-        binding.statusText.setTextColor(
-            getColor(if (enabled) R.color.breath else R.color.text_dim)
-        )
         binding.accessButton.visibility = if (enabled) View.GONE else View.VISIBLE
+        applyStatusCard(binding.accessCard, binding.statusText, enabled)
+
+        // Background-kill mitigation: if Pause isn't battery-optimization exempt the OS can kill
+        // the accessibility service and it silently stops pausing apps until re-toggled.
+        val exempt = isIgnoringBatteryOptimizations()
+        binding.batteryStatusText.text =
+            getString(if (exempt) R.string.battery_on else R.string.battery_off)
+        binding.batteryButton.visibility = if (exempt) View.GONE else View.VISIBLE
+        applyStatusCard(binding.batteryCard, binding.batteryStatusText, exempt)
 
         val count = Prefs.blockedPackages(this).size
         binding.pausedAppsCount.text = resources.getQuantityString(R.plurals.paused_count, count, count)
+    }
+
+    /** Tint a status card green when the thing it tracks is ready, rose when it needs attention. */
+    private fun applyStatusCard(card: MaterialCardView, label: TextView, ok: Boolean) {
+        card.setCardBackgroundColor(
+            getColor(if (ok) R.color.status_ok_container else R.color.status_warn_container)
+        )
+        card.setStrokeColor(
+            getColor(if (ok) R.color.status_ok_outline else R.color.status_warn_outline)
+        )
+        label.setTextColor(getColor(if (ok) R.color.status_ok else R.color.status_warn))
+    }
+
+    private fun isIgnoringBatteryOptimizations(): Boolean {
+        val pm = getSystemService(POWER_SERVICE) as PowerManager
+        return pm.isIgnoringBatteryOptimizations(packageName)
+    }
+
+    /** Ask the OS to stop battery-optimizing Pause. The direct dialog needs the
+     *  REQUEST_IGNORE_BATTERY_OPTIMIZATIONS permission; fall back to the settings list otherwise. */
+    private fun requestBatteryExemption() {
+        try {
+            startActivity(
+                Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                    .setData(Uri.parse("package:$packageName"))
+            )
+        } catch (e: Exception) {
+            try {
+                startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+            } catch (e2: Exception) {
+                openAppSettings()
+            }
+        }
+    }
+
+    /** Manufacturer-specific steps for the OEM "autostart / never sleep" settings that the
+     *  battery exemption alone doesn't cover. No AOSP API exists for these, so we guide by text. */
+    private fun showBatteryHelp() {
+        val body = when (Build.MANUFACTURER.lowercase()) {
+            "samsung" -> R.string.battery_help_samsung
+            "xiaomi", "redmi", "poco" -> R.string.battery_help_xiaomi
+            "oppo", "realme", "oneplus" -> R.string.battery_help_oppo
+            "vivo", "iqoo" -> R.string.battery_help_vivo
+            "huawei", "honor" -> R.string.battery_help_huawei
+            else -> R.string.battery_help_generic
+        }
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.battery_help_title)
+            .setMessage(body)
+            .setPositiveButton(R.string.got_it, null)
+            .setNeutralButton(R.string.battery_open_settings) { _, _ -> openAppSettings() }
+            .setNegativeButton(R.string.battery_more_help) { _, _ -> openDontKillMyApp() }
+            .show()
+    }
+
+    private fun openAppSettings() {
+        try {
+            startActivity(
+                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    .setData(Uri.parse("package:$packageName"))
+            )
+        } catch (_: Exception) {
+        }
+    }
+
+    private fun openDontKillMyApp() {
+        val slug = Build.MANUFACTURER.lowercase().replace(' ', '-')
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://dontkillmyapp.com/$slug")))
+        } catch (_: Exception) {
+        }
     }
 
     private fun isServiceEnabled(): Boolean {

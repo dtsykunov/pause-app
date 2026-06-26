@@ -56,6 +56,7 @@
 
     <!-- Accessibility status -->
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/accessCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -88,6 +89,53 @@
                 android:layout_height="wrap_content"
                 android:minHeight="48dp"
                 android:text="@string/turn_on" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Background activity (keeps the service alive so it doesn't silently stop) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/batteryCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:cardBackgroundColor="@color/panel"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/outline"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="8dp"
+            android:paddingVertical="6dp">
+
+            <TextView
+                android:id="@+id/batteryStatusText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="15sp" />
+
+            <ImageButton
+                android:id="@+id/batteryHelp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/help"
+                android:padding="8dp"
+                android:src="@drawable/ic_help" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/batteryButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/battery_allow" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

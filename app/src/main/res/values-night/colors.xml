@@ -9,6 +9,15 @@
     <color name="text_dim">#9A92B8</color>
     <color name="outline">#4A4268</color>
 
+    <!-- Status cards: soft mint for ready, soft rose for needs-attention (low-saturation to sit
+         with the deep indigo ground). -->
+    <color name="status_ok">#8FD3A6</color>
+    <color name="status_ok_container">#243A2E</color>
+    <color name="status_ok_outline">#3C5A47</color>
+    <color name="status_warn">#E89AA3</color>
+    <color name="status_warn_container">#3A2730</color>
+    <color name="status_warn_outline">#5A3C44</color>
+
     <!-- Pause overlay -->
     <color name="overlay_bg">#1A1530</color>
     <color name="overlay_circle">#9B8DD4</color>

@@ -9,6 +9,15 @@
     <color name="text_dim">#6A6080</color>
     <color name="outline">#C4BAE0</color>
 
+    <!-- Status cards: muted sage for ready, soft rose for needs-attention (kept low-saturation
+         to sit with the lavender ground). -->
+    <color name="status_ok">#2F6B47</color>
+    <color name="status_ok_container">#DCEDE1</color>
+    <color name="status_ok_outline">#A9D3B6</color>
+    <color name="status_warn">#8E2F3D</color>
+    <color name="status_warn_container">#F4DEE1</color>
+    <color name="status_warn_outline">#E0B3BA</color>
+
     <!-- Pause overlay -->
     <color name="overlay_bg">#F5F0FC</color>
     <color name="overlay_circle">#7260A8</color>

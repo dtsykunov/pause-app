@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Lets us ask the OS to stop battery-optimizing Pause, so the accessibility service isn't
+         killed in the background and silently stops pausing apps. -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
     <!-- Needed on API 30+ to see other launchable apps so the user can pick which to pause. -->
     <queries>
         <intent>

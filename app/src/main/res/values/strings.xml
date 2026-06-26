@@ -8,6 +8,19 @@
     <string name="status_off">Accessibility access is off</string>
     <string name="turn_on">Turn on</string>
 
+    <string name="battery_on">Background activity is allowed</string>
+    <string name="battery_off">Pause may be stopped in the background</string>
+    <string name="battery_allow">Allow</string>
+    <string name="battery_help_title">Keep Pause running</string>
+    <string name="battery_help_generic">Phones sometimes close apps running in the background to save power, which stops Pause from working until you turn accessibility off and on again.\n\nTap Allow to let Pause keep running. On some phones you should also turn off battery optimization or \"put app to sleep\" for Pause in the system settings.</string>
+    <string name="battery_help_samsung">Phones sometimes close apps running in the background, which stops Pause until you turn accessibility off and on again.\n\n1. Tap Allow to let Pause keep running.\n2. Open Settings, Battery, Background usage limits.\n3. Add Pause to \"Never sleeping apps\", and make sure it is not under Sleeping or Deep sleeping apps.</string>
+    <string name="battery_help_xiaomi">Phones sometimes close apps running in the background, which stops Pause until you turn accessibility off and on again.\n\n1. Tap Allow to let Pause keep running.\n2. In the app settings, set Battery saver to \"No restrictions\".\n3. Turn on Autostart for Pause.</string>
+    <string name="battery_help_oppo">Phones sometimes close apps running in the background, which stops Pause until you turn accessibility off and on again.\n\n1. Tap Allow to let Pause keep running.\n2. In the app settings, allow Auto-launch and background running for Pause.\n3. Turn off battery optimization for Pause.</string>
+    <string name="battery_help_vivo">Phones sometimes close apps running in the background, which stops Pause until you turn accessibility off and on again.\n\n1. Tap Allow to let Pause keep running.\n2. Allow Autostart and background running for Pause.\n3. Set high background power consumption to allowed for Pause.</string>
+    <string name="battery_help_huawei">Phones sometimes close apps running in the background, which stops Pause until you turn accessibility off and on again.\n\n1. Tap Allow to let Pause keep running.\n2. In the app settings, set Pause to Manage manually.\n3. Turn on Auto-launch, Secondary launch, and Run in background.</string>
+    <string name="battery_open_settings">Open app settings</string>
+    <string name="battery_more_help">More help</string>
+
     <string name="section_length">Pause length</string>
     <string name="section_message">Message</string>
     <string name="section_apps">Paused apps</string>
