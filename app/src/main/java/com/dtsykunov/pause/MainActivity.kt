@@ -29,6 +29,9 @@ class MainActivity : AppCompatActivity() {
         binding.accessButton.setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         }
+        binding.accessHelp.setOnClickListener {
+            showHint(R.string.access_help_title, R.string.access_help_body)
+        }
 
         binding.batteryButton.setOnClickListener { requestBatteryExemption() }
         binding.batteryHelp.setOnClickListener { showBatteryHelp() }

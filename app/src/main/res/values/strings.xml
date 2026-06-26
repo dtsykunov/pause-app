@@ -7,6 +7,8 @@
     <string name="status_on">Accessibility access is on</string>
     <string name="status_off">Accessibility access is off</string>
     <string name="turn_on">Turn on</string>
+    <string name="access_help_title">Why accessibility access</string>
+    <string name="access_help_body">Pause uses Android\'s accessibility service to notice when you open one of your chosen apps, so it can show the pause screen before you continue.</string>
 
     <string name="battery_on">Background activity is allowed</string>
     <string name="battery_off">Pause may be stopped in the background</string>
