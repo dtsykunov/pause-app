@@ -1,5 +1,6 @@
 package com.dtsykunov.pause
 
+import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -25,6 +26,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.masterRow.setOnClickListener {
+            if (!isServiceEnabled()) return@setOnClickListener
+            val on = !binding.masterSwitch.isChecked
+            binding.masterSwitch.isChecked = on
+            Prefs.setGlobalEnabled(this, on)
+            updateMasterSubtitle(on)
+        }
 
         binding.accessButton.setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
@@ -104,6 +113,16 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         val enabled = isServiceEnabled()
+
+        binding.masterRow.isEnabled = enabled
+        binding.masterSwitch.isEnabled = enabled
+        val on = enabled && Prefs.globalEnabled(this)
+        binding.masterSwitch.isChecked = on
+        binding.masterTitle.alpha = if (enabled) 1f else 0.5f
+        binding.masterSubtitle.text = getString(
+            if (!enabled) R.string.master_needs_access else if (on) R.string.master_on else R.string.master_off
+        )
+
         binding.statusText.text =
             getString(if (enabled) R.string.status_on else R.string.status_off)
         binding.accessButton.visibility = if (enabled) View.GONE else View.VISIBLE
@@ -192,8 +211,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateMasterSubtitle(on: Boolean) {
+        binding.masterSubtitle.text = getString(if (on) R.string.master_on else R.string.master_off)
+    }
+
     private fun isServiceEnabled(): Boolean {
-        val expected = "$packageName/$packageName.AppMonitorService"
+        val expected = ComponentName(this, AppMonitorService::class.java).flattenToString()
         val enabled = Settings.Secure.getString(
             contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
         ) ?: return false

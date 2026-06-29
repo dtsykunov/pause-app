@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 /** All persistence: which apps are paused, the pause duration, and recent open attempts. */
 object Prefs {
     private const val FILE = "pause_prefs"
+    private const val KEY_GLOBAL_ENABLED = "global_enabled"
     private const val KEY_BLOCKED = "blocked_packages"
     private const val KEY_DURATION = "pause_seconds"
     private const val KEY_PHRASE = "pause_phrase"
@@ -31,6 +32,10 @@ object Prefs {
 
     private fun sp(c: Context): SharedPreferences =
         c.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+
+    fun globalEnabled(c: Context): Boolean = sp(c).getBoolean(KEY_GLOBAL_ENABLED, true)
+
+    fun setGlobalEnabled(c: Context, on: Boolean) { sp(c).edit().putBoolean(KEY_GLOBAL_ENABLED, on).apply() }
 
     fun blockedPackages(c: Context): Set<String> =
         sp(c).getStringSet(KEY_BLOCKED, emptySet())?.toSet() ?: emptySet()

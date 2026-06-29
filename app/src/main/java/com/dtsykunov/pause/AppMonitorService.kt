@@ -100,6 +100,7 @@ class AppMonitorService : AccessibilityService() {
     /** Confirm the real foreground app and intervene if it's a newly-opened paused one. */
     private fun evaluateForeground() {
         if (keyguard.isKeyguardLocked) return
+        if (!Prefs.globalEnabled(this)) return
         val active = rootInActiveWindow?.packageName?.toString() ?: return
         if (isTransientWindow(active)) return // system UI, keyboard, our own overlay
         if (active == currentApp) return      // same app: in-app nav, keyboard toggle, dialog, back
