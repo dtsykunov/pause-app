@@ -4,7 +4,7 @@
     <string name="service_label">Pause monitor</string>
     <string name="service_description">Detects when you open a chosen app and shows a timed pause before you continue.</string>
 
-    <string name="master_label">Pause and Think</string>
+    <string name="master_label">Enabled</string>
     <string name="master_on">On</string>
     <string name="master_off">Off</string>
     <string name="master_needs_access">Turn on accessibility to enable</string>

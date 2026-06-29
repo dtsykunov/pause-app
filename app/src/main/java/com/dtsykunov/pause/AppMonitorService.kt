@@ -6,11 +6,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Rect
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.provider.Settings
 import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityWindowInfo
 
 /**
  * Watches for foreground app changes and shows the pause overlay when a paused app genuinely
@@ -78,14 +80,22 @@ class AppMonitorService : AccessibilityService() {
         val pkg = event.packageName?.toString() ?: return
         if (pkg == packageName) return
 
-        // While the pause is up, a move to any real window other than the paused app (home,
-        // recents, another app) means the user navigated away with a system gesture. Just
-        // drop the pause and let that destination show: no stats, no forced home.
         if (overlay?.isShowing == true) {
+            // Pulling the notification shade down opens it *behind* our accessibility overlay,
+            // where it's unusable. The shade isn't a navigation, so just dropping the pause would
+            // leave the paused app in front once the shade closes. Treat the pull like Cancel:
+            // drop the pause and send the app to the background (no stats — a shade pull isn't a
+            // deliberate Cancel). GLOBAL_ACTION_HOME also collapses the shade.
+            if (isShadeOpen()) {
+                dismissOverlay()
+                performGlobalAction(GLOBAL_ACTION_HOME)
+                return
+            }
+            // A move to any real window other than the paused app (home, recents, another app)
+            // means the user navigated away with a system gesture. Drop the pause and let that
+            // destination show: no stats, no forced home.
             if (!isTransientWindow(pkg) && pkg != currentApp) {
-                cancelPending()
-                overlay?.dismissNow()
-                overlay = null
+                dismissOverlay()
             }
             return
         }
@@ -133,6 +143,21 @@ class AppMonitorService : AccessibilityService() {
             ?.substringBefore('/')
             ?.takeIf { it.isNotEmpty() }
 
+    /**
+     * True when the notification shade (or quick settings) is pulled down. The expanded shade is a
+     * near-fullscreen [AccessibilityWindowInfo.TYPE_SYSTEM] window; the only other system windows
+     * are the thin status and navigation bars, so a tall one means the shade is open. (Reading the
+     * window list needs FLAG_RETRIEVE_INTERACTIVE_WINDOWS in the service config.)
+     */
+    private fun isShadeOpen(): Boolean {
+        val screenH = resources.displayMetrics.heightPixels
+        val bounds = Rect()
+        return windows?.any { w ->
+            w.type == AccessibilityWindowInfo.TYPE_SYSTEM &&
+                run { w.getBoundsInScreen(bounds); bounds.height() >= screenH * 0.6 }
+        } == true
+    }
+
     private fun showOverlay(pkg: String, attempts: Int, lastOpenedAt: Long?, seconds: Int, phrase: String, showTimer: Boolean) {
         val shownAt = SystemClock.elapsedRealtime()
         overlay = InterventionOverlay(
@@ -175,6 +200,13 @@ class AppMonitorService : AccessibilityService() {
     private fun cancelPending() {
         pendingCheck?.let { handler.removeCallbacks(it) }
         pendingCheck = null
+    }
+
+    /** Drop the pause immediately and stop any pending foreground check. */
+    private fun dismissOverlay() {
+        cancelPending()
+        overlay?.dismissNow()
+        overlay = null
     }
 
     override fun onInterrupt() {}
