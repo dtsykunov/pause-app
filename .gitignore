@@ -14,3 +14,6 @@ keystore.properties
 
 # Local agent / editor settings
 .claude/
+
+# direnv / nix
+.direnv/
