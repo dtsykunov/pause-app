@@ -100,6 +100,13 @@ class AppMonitorService : AccessibilityService() {
             return
         }
 
+        // A genuine move away from the confirmed app must not be lost to debounce coalescing —
+        // otherwise a fast close+reopen of the same paused app would look unchanged once the
+        // debounce settles, and the pause would silently fail to re-trigger.
+        if (pkg != currentApp && !isTransientWindow(pkg)) {
+            currentApp = null
+        }
+
         // Debounce, then confirm against the real active window.
         cancelPending()
         val check = Runnable { evaluateForeground() }
@@ -207,6 +214,7 @@ class AppMonitorService : AccessibilityService() {
         cancelPending()
         overlay?.dismissNow()
         overlay = null
+        currentApp = null
     }
 
     override fun onInterrupt() {}
