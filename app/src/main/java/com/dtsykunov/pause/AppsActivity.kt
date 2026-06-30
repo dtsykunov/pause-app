@@ -62,6 +62,7 @@ class AppsActivity : AppCompatActivity() {
                 .sortedBy { it.label.lowercase() }
 
             runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
                 allEntries = entries
                 binding.loadingText.visibility = View.GONE
                 applyFilter(binding.searchInput.text?.toString().orEmpty())

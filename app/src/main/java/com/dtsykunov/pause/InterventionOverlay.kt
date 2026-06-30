@@ -42,18 +42,19 @@ class InterventionOverlay(
 
     private var timer: CountDownTimer? = null
     private var removed = false
+    private var dismissing = false
 
     fun show() {
         bindTexts()
 
-        binding.closeButton.setOnClickListener { onClose(); slideOutAndRemove() }
-        binding.openButton.setOnClickListener { onOpenAnyway(); slideOutAndRemove() }
+        binding.closeButton.setOnClickListener { dismiss(onClose) }
+        binding.openButton.setOnClickListener { dismiss(onOpenAnyway) }
 
         // Let the overlay handle the back key as "not now".
         binding.root.isFocusableInTouchMode = true
         binding.root.setOnKeyListener { _, keyCode, ev ->
             if (keyCode == KeyEvent.KEYCODE_BACK && ev.action == KeyEvent.ACTION_UP) {
-                onClose(); slideOutAndRemove(); true
+                dismiss(onClose); true
             } else false
         }
 
@@ -140,6 +141,16 @@ class InterventionOverlay(
         binding.openButton.alpha = 0f
         binding.openButton.visibility = View.VISIBLE
         binding.openButton.animate().alpha(1f).setDuration(300).start()
+    }
+
+    /** Run [action] (onClose/onOpenAnyway) and start the dismiss animation, once only — the
+     *  close button, open button, and back key all stay live during the slide-out, so without
+     *  this guard a fast double-tap would double-record stats. */
+    private fun dismiss(action: () -> Unit) {
+        if (dismissing) return
+        dismissing = true
+        action()
+        slideOutAndRemove()
     }
 
     private fun slideOutAndRemove() {
