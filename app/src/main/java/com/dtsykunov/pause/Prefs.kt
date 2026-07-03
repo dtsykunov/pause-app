@@ -48,7 +48,7 @@ object Prefs {
         sp(c).getStringSet(KEY_BLOCKED, emptySet())?.contains(pkg) == true
 
     fun pauseSeconds(c: Context): Int =
-        sp(c).getInt(KEY_DURATION, DEFAULT_DURATION)
+        sp(c).getInt(KEY_DURATION, DEFAULT_DURATION).coerceIn(MIN_DURATION, MAX_DURATION)
 
     fun setPauseSeconds(c: Context, seconds: Int) {
         sp(c).edit().putInt(KEY_DURATION, seconds).apply()
@@ -71,7 +71,8 @@ object Prefs {
     }
 
     /** Minutes after "Open anyway" during which the app won't be paused again. */
-    fun allowMinutes(c: Context): Int = sp(c).getInt(KEY_ALLOW_MIN, DEFAULT_ALLOW_MIN)
+    fun allowMinutes(c: Context): Int =
+        sp(c).getInt(KEY_ALLOW_MIN, DEFAULT_ALLOW_MIN).coerceIn(MIN_ALLOW_MIN, MAX_ALLOW_MIN)
 
     fun setAllowMinutes(c: Context, minutes: Int) {
         sp(c).edit().putInt(KEY_ALLOW_MIN, minutes).apply()

@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
             showHint(R.string.section_allow, R.string.help_allow_body)
         }
 
-        val initial = Prefs.pauseSeconds(this).coerceIn(Prefs.MIN_DURATION, Prefs.MAX_DURATION)
+        val initial = Prefs.pauseSeconds(this)
         binding.durationSlider.value = initial.toFloat()
         binding.durationLabel.text = getString(R.string.duration_value, initial)
         binding.durationSlider.addOnChangeListener { _, value, _ ->
@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, R.string.message_saved, Toast.LENGTH_SHORT).show()
         }
 
-        val allow = Prefs.allowMinutes(this).coerceIn(Prefs.MIN_ALLOW_MIN, Prefs.MAX_ALLOW_MIN)
+        val allow = Prefs.allowMinutes(this)
         binding.allowSlider.value = allow.toFloat()
         binding.allowLabel.text = getString(R.string.allow_value, allow)
         binding.allowSlider.addOnChangeListener { _, value, _ ->
