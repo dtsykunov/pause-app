@@ -70,4 +70,7 @@
     <string name="stat_details">Shown %1$d · Opened %2$d · Cancelled %3$d</string>
     <string name="stats_empty">No pauses yet. They\'ll show up here once you open a paused app.</string>
     <string name="reset_stats">Reset stats</string>
+    <string name="reset_confirm_body">Clear all stats? This also resets the open counts shown on the pause screen. It can\'t be undone.</string>
+    <string name="reset_confirm_yes">Reset</string>
+    <string name="reset_confirm_cancel">Cancel</string>
 </resources>

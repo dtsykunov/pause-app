@@ -5,6 +5,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.dtsykunov.pause.databinding.ActivityStatsBinding
 import com.dtsykunov.pause.databinding.ItemStatBinding
 
@@ -20,8 +21,15 @@ class StatsActivity : AppCompatActivity() {
         binding.toolbar.setNavigationOnClickListener { finish() }
 
         binding.resetButton.setOnClickListener {
-            Prefs.resetStats(this)
-            render()
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.reset_stats)
+                .setMessage(R.string.reset_confirm_body)
+                .setPositiveButton(R.string.reset_confirm_yes) { _, _ ->
+                    Prefs.resetStats(this)
+                    render()
+                }
+                .setNegativeButton(R.string.reset_confirm_cancel, null)
+                .show()
         }
     }
 
