@@ -13,7 +13,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.dtsykunov.pause.databinding.ActivityMainBinding
@@ -77,9 +76,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.phraseInput.setText(Prefs.phrase(this))
-        binding.phraseInput.doAfterTextChanged {
-            Prefs.setPhrase(this, it?.toString().orEmpty())
-        }
         binding.saveMessageButton.setOnClickListener {
             Prefs.setPhrase(this, binding.phraseInput.text?.toString().orEmpty())
             binding.phraseInput.clearFocus()
