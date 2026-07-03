@@ -13,6 +13,7 @@ import android.os.SystemClock
 import android.provider.Settings
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityWindowInfo
+import androidx.core.content.ContextCompat
 
 /**
  * Watches for foreground app changes and shows the pause overlay when a paused app genuinely
@@ -66,13 +67,23 @@ class AppMonitorService : AccessibilityService() {
         }
     }
 
+    private var receiverRegistered = false
+
     override fun onServiceConnected() {
         super.onServiceConnected()
-        registerReceiver(powerReceiver, IntentFilter().apply {
-            addAction(Intent.ACTION_SCREEN_OFF)
-            addAction(Intent.ACTION_SCREEN_ON)
-            addAction(Intent.ACTION_USER_PRESENT)
-        })
+        // The system can reconnect the same service instance; register only once.
+        if (receiverRegistered) return
+        receiverRegistered = true
+        ContextCompat.registerReceiver(
+            this,
+            powerReceiver,
+            IntentFilter().apply {
+                addAction(Intent.ACTION_SCREEN_OFF)
+                addAction(Intent.ACTION_SCREEN_ON)
+                addAction(Intent.ACTION_USER_PRESENT)
+            },
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -227,9 +238,9 @@ class AppMonitorService : AccessibilityService() {
     }
 
     override fun onDestroy() {
-        try {
+        if (receiverRegistered) {
+            receiverRegistered = false
             unregisterReceiver(powerReceiver)
-        } catch (_: Exception) {
         }
         super.onDestroy()
     }
