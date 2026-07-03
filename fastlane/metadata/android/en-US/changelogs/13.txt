@@ -1,0 +1,1 @@
+First F-Droid release. A short, timed pause before the apps you choose open, with per-app stats. Everything stays on your phone; the app has no network access.
