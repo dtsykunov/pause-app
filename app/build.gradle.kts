@@ -69,6 +69,13 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    // Play Console dependency metadata is a Google-encrypted blob in the APK
+    // signing block; F-Droid's scanner rejects binaries that contain it.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
 }
 
 dependencies {
