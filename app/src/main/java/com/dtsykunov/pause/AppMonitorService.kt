@@ -103,10 +103,16 @@ class AppMonitorService : AccessibilityService() {
                 return
             }
             // A move to any real window other than the paused app (home, recents, another app)
-            // means the user navigated away with a system gesture. Drop the pause and let that
-            // destination show: no stats, no forced home.
+            // may mean the user navigated away with a system gesture. But raw events are noisy
+            // exactly while the paused app is still launching (launcher transitions, permission
+            // prompts, trampoline activities), and dismissing on them makes the pause flicker:
+            // each spurious dismiss is followed by a re-show once the app's own events settle.
+            // So confirm against the real window stack after a settle, like the show path does.
             if (!isTransientWindow(pkg) && pkg != currentApp) {
-                dismissOverlay()
+                cancelPending()
+                val check = Runnable { confirmNavigatedAway() }
+                pendingCheck = check
+                handler.postDelayed(check, settleDelayMs)
             }
             return
         }
@@ -146,6 +152,25 @@ class AppMonitorService : AccessibilityService() {
         val attempts = Prefs.recordAttempt(this, active)
         Prefs.incInterruptions(this, active)
         showOverlay(active, attempts, lastOpenedAt, Prefs.pauseSeconds(this), Prefs.phrase(this), Prefs.showTimer(this))
+    }
+
+    /**
+     * Debounced check after a foreign window event arrived while the pause was up: dismiss only
+     * if a real application window other than the paused app is actually in front. During an app
+     * launch the noisy foreign events settle with the paused app still on top, so the pause
+     * stays. [rootInActiveWindow] can't tell these cases apart — the focused overlay itself is
+     * the active window — so read the window stack instead: the topmost application window is
+     * where the user would land (our overlay is TYPE_ACCESSIBILITY_OVERLAY and doesn't count).
+     */
+    private fun confirmNavigatedAway() {
+        if (overlay?.isShowing != true) return
+        val top = windows?.asSequence()
+            ?.filter { it.type == AccessibilityWindowInfo.TYPE_APPLICATION }
+            ?.mapNotNull { it.root?.packageName?.toString() }
+            ?.firstOrNull() ?: return
+        if (!isTransientWindow(top) && top != currentApp) {
+            dismissOverlay()
+        }
     }
 
     private fun allowWindowMs(): Long = Prefs.allowMinutes(this) * 60_000L

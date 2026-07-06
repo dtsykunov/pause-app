@@ -1,0 +1,1 @@
+Fix the pause screen flickering (showing and disappearing repeatedly) while an app is still launching.
