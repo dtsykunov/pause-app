@@ -1,0 +1,1 @@
+Fix the pause wrongly reappearing mid-session: dialogs, sign-in screens, and short screen locks no longer count as reopening the app.
