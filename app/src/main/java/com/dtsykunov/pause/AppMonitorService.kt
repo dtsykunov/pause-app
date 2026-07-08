@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.os.Handler
 import android.os.Looper
@@ -40,6 +41,9 @@ class AppMonitorService : AccessibilityService() {
     private var pendingCheck: Runnable? = null
     private val settleDelayMs = 250L
 
+    /** Extra confirm polls when a navigated-away check is inconclusive mid-transition. */
+    private val confirmRetries = 2
+
     private val keyguard by lazy { getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager }
 
     private val powerReceiver = object : BroadcastReceiver() {
@@ -58,10 +62,7 @@ class AppMonitorService : AccessibilityService() {
                 // harmless (evaluateForeground returns while the keyguard is still locked).
                 Intent.ACTION_SCREEN_ON, Intent.ACTION_USER_PRESENT -> {
                     currentApp = null
-                    cancelPending()
-                    val check = Runnable { evaluateForeground() }
-                    pendingCheck = check
-                    handler.postDelayed(check, settleDelayMs)
+                    postDelayedCheck { evaluateForeground() }
                 }
             }
         }
@@ -107,12 +108,22 @@ class AppMonitorService : AccessibilityService() {
             // exactly while the paused app is still launching (launcher transitions, permission
             // prompts, trampoline activities), and dismissing on them makes the pause flicker:
             // each spurious dismiss is followed by a re-show once the app's own events settle.
-            // So confirm against the real window stack after a settle, like the show path does.
+            // So never dismiss on the raw event; only when the window stack confirms it.
             if (!isTransientWindow(pkg) && pkg != currentApp) {
-                cancelPending()
-                val check = Runnable { confirmNavigatedAway() }
-                pendingCheck = check
-                handler.postDelayed(check, settleDelayMs)
+                // Home and recents gestures land on the launcher, and our overlay covers the
+                // recents view until dismissed, so latency here is very visible. When the stack
+                // already agrees the user left, dismiss on the spot. Gated to the launcher
+                // because short-lived trampoline/dialog windows are also momentarily topmost
+                // right when their event fires — but nothing trampolines through home.
+                if (pkg == defaultLauncherPackage() && navigatedAway()) {
+                    dismissOverlay()
+                    return
+                }
+                // Otherwise confirm after a settle. Keep an already-scheduled confirm instead
+                // of resetting it — repeated noisy events would push the check out forever.
+                if (pendingCheck == null) {
+                    postDelayedCheck { confirmNavigatedAway(confirmRetries) }
+                }
             }
             return
         }
@@ -125,10 +136,7 @@ class AppMonitorService : AccessibilityService() {
         }
 
         // Debounce, then confirm against the real active window.
-        cancelPending()
-        val check = Runnable { evaluateForeground() }
-        pendingCheck = check
-        handler.postDelayed(check, settleDelayMs)
+        postDelayedCheck { evaluateForeground() }
     }
 
     /** Confirm the real foreground app and intervene if it's a newly-opened paused one. */
@@ -158,20 +166,43 @@ class AppMonitorService : AccessibilityService() {
      * Debounced check after a foreign window event arrived while the pause was up: dismiss only
      * if a real application window other than the paused app is actually in front. During an app
      * launch the noisy foreign events settle with the paused app still on top, so the pause
-     * stays. [rootInActiveWindow] can't tell these cases apart — the focused overlay itself is
-     * the active window — so read the window stack instead: the topmost application window is
-     * where the user would land (our overlay is TYPE_ACCESSIBILITY_OVERLAY and doesn't count).
+     * stays. Mid-transition the stack can also still show the paused app (or nothing) even
+     * though the user is navigating away, and no further event may arrive — so an inconclusive
+     * read retries a bounded number of times instead of waiting for the next event.
      */
-    private fun confirmNavigatedAway() {
+    private fun confirmNavigatedAway(retriesLeft: Int) {
         if (overlay?.isShowing != true) return
-        val top = windows?.asSequence()
-            ?.filter { it.type == AccessibilityWindowInfo.TYPE_APPLICATION }
-            ?.mapNotNull { it.root?.packageName?.toString() }
-            ?.firstOrNull() ?: return
-        if (!isTransientWindow(top) && top != currentApp) {
+        if (navigatedAway()) {
             dismissOverlay()
+            return
+        }
+        if (retriesLeft > 0) {
+            postDelayedCheck { confirmNavigatedAway(retriesLeft - 1) }
         }
     }
+
+    /**
+     * Topmost application window's package — where the user would land. [rootInActiveWindow]
+     * can't make that call while the pause is up (the focused overlay itself is the active
+     * window), but our overlay is TYPE_ACCESSIBILITY_OVERLAY and doesn't count here.
+     */
+    private fun topApplicationPackage(): String? =
+        windows?.asSequence()
+            ?.filter { it.type == AccessibilityWindowInfo.TYPE_APPLICATION }
+            ?.mapNotNull { it.root?.packageName?.toString() }
+            ?.firstOrNull()
+
+    /** True when the window stack shows a real app other than the paused one on top. */
+    private fun navigatedAway(): Boolean {
+        val top = topApplicationPackage() ?: return false
+        return !isTransientWindow(top) && top != currentApp
+    }
+
+    private fun defaultLauncherPackage(): String? =
+        packageManager.resolveActivity(
+            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME),
+            PackageManager.MATCH_DEFAULT_ONLY,
+        )?.activityInfo?.packageName
 
     private fun allowWindowMs(): Long = Prefs.allowMinutes(this) * 60_000L
 
@@ -238,6 +269,18 @@ class AppMonitorService : AccessibilityService() {
         pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString()
     } catch (e: Exception) {
         pkg
+    }
+
+    /** Replace any pending check with [action], to run after the settle delay. Clearing
+     *  [pendingCheck] on execution is what lets callers see whether one is still scheduled. */
+    private fun postDelayedCheck(action: () -> Unit) {
+        cancelPending()
+        val check = Runnable {
+            pendingCheck = null
+            action()
+        }
+        pendingCheck = check
+        handler.postDelayed(check, settleDelayMs)
     }
 
     private fun cancelPending() {

@@ -1,0 +1,1 @@
+Dismiss the pause screen immediately when you swipe to home or recents.
