@@ -1,0 +1,1 @@
+Fix pauses being skipped in split screen and after long absences with lockscreen glances, and the pause wrongly closing or reappearing around picture-in-picture and transition flickers.

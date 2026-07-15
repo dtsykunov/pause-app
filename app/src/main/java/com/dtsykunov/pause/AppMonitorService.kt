@@ -40,7 +40,8 @@ class AppMonitorService : AccessibilityService() {
     /** Last confirmed real foreground app (transient/system windows don't count). */
     private var currentApp: String? = null
 
-    /** When the screen last went off (elapsedRealtime); consumed on the next wake. */
+    /** When the screen first went off after the user left (elapsedRealtime); consumed once
+     *  the user is really back past the keyguard. */
     private var screenOffAt: Long? = null
 
     /** Per-app "skip the pause" deadlines, set after Open anyway or inherited from an allowed app. */
@@ -55,8 +56,12 @@ class AppMonitorService : AccessibilityService() {
      *  session app on screen behind a foreign window. */
     private val confirmRetries = 2
 
-    /** A lock shorter than this is a glance away, not the end of the app session. */
+    /** An absence shorter than this is a glance away, not the end of the app session. */
     private val longLockMs = 3 * 60_000L
+
+    private var launcherPackagesCache: Set<String> = emptySet()
+    private var launcherPackagesFetchedAt = 0L
+    private val launcherTtlMs = 30_000L
 
     private val keyguard by lazy { getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager }
 
@@ -65,7 +70,9 @@ class AppMonitorService : AccessibilityService() {
             when (intent?.action) {
                 // A pause shouldn't linger on the lock screen.
                 Intent.ACTION_SCREEN_OFF -> {
-                    screenOffAt = SystemClock.elapsedRealtime()
+                    // Only the first off matters: lockscreen glances and notification wakes
+                    // in between must not restart the absence clock.
+                    if (screenOffAt == null) screenOffAt = SystemClock.elapsedRealtime()
                     // A pause the user never answered must re-fire on wake however short the
                     // lock — otherwise power-button + a short wait would dodge it.
                     if (overlay?.isShowing == true) currentApp = null
@@ -73,17 +80,20 @@ class AppMonitorService : AccessibilityService() {
                     overlay?.dismissNow()
                     overlay = null
                 }
-                // Waking back into an app after a long lock counts as reopening it: clearing
-                // currentApp makes the same app read as a fresh foreground, so an expired
-                // "Open anyway" window pauses again. A short lock is a glance away and keeps
-                // the session. SCREEN_ON covers no-lock devices; USER_PRESENT covers unlock on
-                // secure ones. A redundant double-fire is harmless: screenOffAt is consumed by
-                // the first (and evaluateForeground returns while the keyguard is still
-                // locked), so an AOD wake without a preceding off never uses a stale mark.
+                // Waking back into an app after a long absence counts as reopening it:
+                // clearing currentApp makes the same app read as a fresh foreground, so an
+                // expired "Open anyway" window pauses again. A short absence is a glance away
+                // and keeps the session. The absence runs from the first screen-off until the
+                // user is really back — keyguard gone — so lockscreen glances and notification
+                // wakes neither end it nor restart its clock. SCREEN_ON covers no-lock
+                // devices; USER_PRESENT covers unlock on secure ones; a redundant double-fire
+                // is harmless (the first past the keyguard consumes the mark).
                 Intent.ACTION_SCREEN_ON, Intent.ACTION_USER_PRESENT -> {
-                    val offFor = screenOffAt?.let { SystemClock.elapsedRealtime() - it }
-                    screenOffAt = null
-                    if (offFor != null && offFor >= longLockMs) currentApp = null
+                    if (!keyguard.isKeyguardLocked) {
+                        val offFor = screenOffAt?.let { SystemClock.elapsedRealtime() - it }
+                        screenOffAt = null
+                        if (offFor != null && offFor >= longLockMs) currentApp = null
+                    }
                     postDelayedCheck { evaluateForeground() }
                 }
             }
@@ -137,7 +147,7 @@ class AppMonitorService : AccessibilityService() {
                 // already agrees the user left, dismiss on the spot. Gated to the launcher
                 // because short-lived trampoline/dialog windows are also momentarily topmost
                 // right when their event fires — but nothing trampolines through home.
-                if (pkg == defaultLauncherPackage() && navigatedAway()) {
+                if (pkg in launcherPackages() && navigatedAway()) {
                     dismissOverlay()
                     return
                 }
@@ -157,7 +167,7 @@ class AppMonitorService : AccessibilityService() {
         // sheets, permission dialogs, and invisible trampoline activities riding on a
         // continuing session, and a real switch to another app is confirmed at its own settle
         // and doesn't need the eager reset.
-        if (pkg != currentApp && pkg == defaultLauncherPackage()) {
+        if (pkg != currentApp && pkg in launcherPackages()) {
             currentApp = null
         }
 
@@ -177,13 +187,26 @@ class AppMonitorService : AccessibilityService() {
         // trampoline riding on the session, not a navigation: don't end the session, or the
         // app would wrongly re-pause mid-use once its allow window expired. A genuinely
         // replaced app drops out of the interactive window list when occluded — but it can
-        // still be animating out at the settle, so re-check a bounded number of times before
-        // trusting the keep. Only paused apps have a session worth keeping: the launcher is
-        // still listed behind every app-launch animation and must not delay a fresh pause.
+        // still be animating out at the settle, so re-check a bounded number of times (with
+        // growing delays, so a slow exit animation can't outlast them) before trusting either
+        // verdict. Only paused apps have a session worth keeping: the launcher is still
+        // listed behind every app-launch animation and must not delay a fresh pause. Nor does
+        // another *paused* app in front ride on the session: that's the user entering it
+        // (split screen, a paused share target) and it deserves its own pause — a keep here
+        // would shield it forever while both stay on screen.
         val session = currentApp
-        if (session != null && Prefs.isBlocked(this, session) && isOnScreen(session)) {
-            if (retriesLeft > 0) postDelayedCheck { evaluateForeground(retriesLeft - 1) }
-            return
+        if (session != null && Prefs.isBlocked(this, session) && !Prefs.isBlocked(this, active)) {
+            val retryDelay = settleDelayMs * (1L shl (confirmRetries - retriesLeft + 1))
+            if (isOnScreen(session)) {
+                if (retriesLeft > 0) postDelayedCheck(retryDelay) { evaluateForeground(retriesLeft - 1) }
+                return
+            }
+            // Mid-transition a real window can briefly report no root, leaving the session
+            // app unidentifiable rather than gone: don't end the session on such a read.
+            if (retriesLeft > 0 && applicationWindows().any { it.root == null }) {
+                postDelayedCheck(retryDelay) { evaluateForeground(retriesLeft - 1) }
+                return
+            }
         }
 
         currentApp = active
@@ -226,19 +249,22 @@ class AppMonitorService : AccessibilityService() {
      * window), but our overlay is TYPE_ACCESSIBILITY_OVERLAY and doesn't count here.
      */
     private fun topApplicationPackage(): String? =
-        windows?.asSequence()
-            ?.filter { it.type == AccessibilityWindowInfo.TYPE_APPLICATION }
-            ?.mapNotNull { it.root?.packageName?.toString() }
-            ?.firstOrNull()
+        applicationWindows()
+            .mapNotNull { it.root?.packageName?.toString() }
+            .firstOrNull()
 
-    /** True when [pkg] still has a real application window on screen. PiP doesn't count: a
-     *  persistent picture-in-picture window must not keep a session alive indefinitely. */
+    /** True when [pkg] still has a real application window on screen. */
     private fun isOnScreen(pkg: String): Boolean =
-        windows?.any { w ->
+        applicationWindows().any { it.root?.packageName?.toString() == pkg }
+
+    /** The real application windows on screen, topmost first. PiP doesn't count: a persistent
+     *  picture-in-picture window is never where the user is — it must not keep a session
+     *  alive indefinitely, nor read as the app in front. */
+    private fun applicationWindows(): Sequence<AccessibilityWindowInfo> =
+        windows.orEmpty().asSequence().filter { w ->
             w.type == AccessibilityWindowInfo.TYPE_APPLICATION &&
-                (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || !w.isInPictureInPictureMode) &&
-                w.root?.packageName?.toString() == pkg
-        } == true
+                (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || !w.isInPictureInPictureMode)
+        }
 
     /** True when the window stack shows a real app other than the paused one on top. */
     private fun navigatedAway(): Boolean {
@@ -246,11 +272,22 @@ class AppMonitorService : AccessibilityService() {
         return !isTransientWindow(top) && top != currentApp
     }
 
-    private fun defaultLauncherPackage(): String? =
-        packageManager.resolveActivity(
-            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME),
-            PackageManager.MATCH_DEFAULT_ONLY,
-        )?.activityInfo?.packageName
+    /** Installed launcher (home) packages. Resolving them is a binder IPC and window events
+     *  arrive in bursts, so cache with a short TTL — long enough to keep the event path
+     *  cheap, short enough to pick up an installed or switched launcher. Matching any
+     *  launcher, not just the default, covers a leave through a non-default one (and a
+     *  device with no default set). */
+    private fun launcherPackages(): Set<String> {
+        val now = SystemClock.elapsedRealtime()
+        if (launcherPackagesFetchedAt == 0L || now - launcherPackagesFetchedAt >= launcherTtlMs) {
+            launcherPackagesFetchedAt = now
+            launcherPackagesCache = packageManager.queryIntentActivities(
+                Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME),
+                PackageManager.MATCH_DEFAULT_ONLY,
+            ).mapNotNull { it.activityInfo?.packageName }.toSet()
+        }
+        return launcherPackagesCache
+    }
 
     private fun allowWindowMs(): Long = Prefs.allowMinutes(this) * 60_000L
 
@@ -321,14 +358,14 @@ class AppMonitorService : AccessibilityService() {
 
     /** Replace any pending check with [action], to run after the settle delay. Clearing
      *  [pendingCheck] on execution is what lets callers see whether one is still scheduled. */
-    private fun postDelayedCheck(action: () -> Unit) {
+    private fun postDelayedCheck(delayMs: Long = settleDelayMs, action: () -> Unit) {
         cancelPending()
         val check = Runnable {
             pendingCheck = null
             action()
         }
         pendingCheck = check
-        handler.postDelayed(check, settleDelayMs)
+        handler.postDelayed(check, delayMs)
     }
 
     private fun cancelPending() {

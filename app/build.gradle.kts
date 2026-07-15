@@ -23,8 +23,8 @@ android {
         applicationId = "com.dtsykunov.pause"
         minSdk = 24
         targetSdk = 34
-        versionCode = 18
-        versionName = "0.3.7"
+        versionCode = 19
+        versionName = "0.3.8"
         resourceConfigurations += listOf("en")
     }
 
