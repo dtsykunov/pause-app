@@ -1,0 +1,1 @@
+Fix the pause screen being unreadable and undismissable in landscape orientation.
