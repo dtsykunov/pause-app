@@ -41,7 +41,7 @@
     "applicationCategory": "LifestyleApplication",
     "description": "A free, open-source Android app that adds a short, timed pause before you open distracting apps, so you open with intention. For phones without a built-in pause before apps open.",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "downloadUrl": "https://github.com/dtsykunov/pause-app/releases/latest"
+    "downloadUrl": "https://f-droid.org/en/packages/com.dtsykunov.pause/"
   }
   </script>
 
@@ -92,6 +92,9 @@
     }
     .btn:hover { filter: brightness(1.07); }
     .btn.ghost { background: transparent; color: var(--dim); font-weight: 500; }
+    .fdroid-badge { display: inline-block; margin: 6px; line-height: 0; }
+    .fdroid-badge img { height: 56px; width: auto; }
+    .fdroid-badge:hover { filter: brightness(1.07); }
     .sub { color: var(--dim); font-size: 0.9rem; margin-top: 14px; }
 
     section { padding: 40px 0; border-top: 1px solid var(--outline); }
@@ -144,7 +147,9 @@
       <div class="ring" aria-hidden="true"><span></span></div>
       <h1>Pause</h1>
       <p class="tagline">A short pause before chosen apps open. Enough to turn an automatic tap into a deliberate choice.</p>
-      <a class="btn" href="https://github.com/dtsykunov/pause-app/releases/latest">Download for Android</a>
+      <a class="fdroid-badge" href="https://f-droid.org/en/packages/com.dtsykunov.pause/"><img src="fdroid-badge.svg" alt="Get it on F-Droid" height="56" /></a>
+      <br />
+      <a class="btn ghost" href="https://github.com/dtsykunov/pause-app/releases/latest">Download APK from GitHub</a>
       <a class="btn ghost" href="https://github.com/dtsykunov/pause-app">Source code on GitHub</a>
       <p class="sub">Free &amp; open-source · no account · no tracking · no subscription</p>
     </header>
@@ -217,7 +222,7 @@
     <section>
       <h2>Set up</h2>
       <ol class="steps">
-        <li><a class="inline" href="https://github.com/dtsykunov/pause-app/releases/latest">Download the latest APK</a> and open it on your phone (allow installs from unknown sources if asked).</li>
+        <li>Install from <a class="inline" href="https://f-droid.org/en/packages/com.dtsykunov.pause/">F-Droid</a> (or <a class="inline" href="https://github.com/dtsykunov/pause-app/releases/latest">download the APK from GitHub</a> and allow installs from unknown sources if asked).</li>
         <li>Open Pause and turn on accessibility access.</li>
         <li>Set your pause length and message, then choose the apps to pause.</li>
       </ol>

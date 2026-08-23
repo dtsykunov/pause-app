@@ -13,6 +13,12 @@ screen, so it needs no "draw over other apps" permission, and the app has no net
 > and Samsung). If your phone has those, prefer them. Pause is for older devices, custom ROMs, and
 > phones that ship without Google's Digital Wellbeing.
 
+## Get the app
+
+[<img src="docs/fdroid-badge.svg" alt="Get it on F-Droid" height="80">](https://f-droid.org/en/packages/com.dtsykunov.pause/)
+
+Or download the APK from [GitHub Releases](https://github.com/dtsykunov/pause-app/releases/latest).
+
 ## Screenshots
 
 <p align="center">
