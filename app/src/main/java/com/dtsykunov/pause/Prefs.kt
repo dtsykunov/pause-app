@@ -2,6 +2,7 @@ package com.dtsykunov.pause
 
 import android.content.Context
 import android.content.SharedPreferences
+import kotlin.random.Random
 
 /** All persistence: which apps are paused, the pause duration, and recent open attempts. */
 object Prefs {
@@ -9,6 +10,9 @@ object Prefs {
     private const val KEY_GLOBAL_ENABLED = "global_enabled"
     private const val KEY_BLOCKED = "blocked_packages"
     private const val KEY_DURATION = "pause_seconds"
+    private const val KEY_DURATION_MODE = "duration_mode"
+    private const val KEY_DURATION_MIN = "duration_min"
+    private const val KEY_DURATION_MAX = "duration_max"
     private const val KEY_PHRASE = "pause_phrase"
     private const val KEY_SHOW_TIMER = "show_timer"
     private const val KEY_ALLOW_MIN = "allow_minutes"
@@ -25,6 +29,10 @@ object Prefs {
     const val DEFAULT_DURATION = 10
     const val MIN_DURATION = 3
     const val MAX_DURATION = 30
+    const val MODE_FIXED = "fixed"
+    const val MODE_RANDOM = "random"
+    const val DEFAULT_DURATION_MIN = 5
+    const val DEFAULT_DURATION_MAX = 20
     const val DEFAULT_PHRASE = "Take a moment"
     const val DEFAULT_ALLOW_MIN = 15
     const val MIN_ALLOW_MIN = 1
@@ -52,6 +60,40 @@ object Prefs {
 
     fun setPauseSeconds(c: Context, seconds: Int) {
         sp(c).edit().putInt(KEY_DURATION, seconds).apply()
+    }
+
+    /** "fixed" or "random"; falls back to "fixed" for a missing or unrecognized value so an
+     *  install that has never set this (or a downgrade reading a mode it doesn't know) keeps
+     *  today's single-duration behavior. */
+    fun durationMode(c: Context): String =
+        if (sp(c).getString(KEY_DURATION_MODE, MODE_FIXED) == MODE_RANDOM) MODE_RANDOM else MODE_FIXED
+
+    fun setDurationMode(c: Context, mode: String) {
+        sp(c).edit().putString(KEY_DURATION_MODE, mode).apply()
+    }
+
+    fun durationMin(c: Context): Int =
+        sp(c).getInt(KEY_DURATION_MIN, DEFAULT_DURATION_MIN).coerceIn(MIN_DURATION, MAX_DURATION)
+
+    fun durationMax(c: Context): Int =
+        sp(c).getInt(KEY_DURATION_MAX, DEFAULT_DURATION_MAX).coerceIn(MIN_DURATION, MAX_DURATION)
+
+    /** Stores [min]/[max] clamped to the allowed bounds, with max never below min. */
+    fun setDurationRange(c: Context, min: Int, max: Int) {
+        val lo = min.coerceIn(MIN_DURATION, MAX_DURATION)
+        val hi = max.coerceIn(MIN_DURATION, MAX_DURATION).coerceAtLeast(lo)
+        sp(c).edit().putInt(KEY_DURATION_MIN, lo).putInt(KEY_DURATION_MAX, hi).apply()
+    }
+
+    /** The pause length to use for the next pause: the fixed value, or a fresh pick within the
+     *  configured range each time this is called. */
+    fun resolvePauseSeconds(c: Context): Int = when (durationMode(c)) {
+        MODE_RANDOM -> {
+            val lo = durationMin(c)
+            val hi = durationMax(c).coerceAtLeast(lo)
+            if (lo == hi) lo else Random.nextInt(lo, hi + 1)
+        }
+        else -> pauseSeconds(c)
     }
 
     /** The message shown during the pause; falls back to the default when blank. */

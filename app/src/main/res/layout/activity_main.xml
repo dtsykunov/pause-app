@@ -286,6 +286,59 @@
         android:valueTo="30"
         app:tickVisible="false" />
 
+    <TextView
+        android:id="@+id/rangeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="@color/text_primary"
+        android:textSize="20sp"
+        android:visibility="gone" />
+
+    <com.google.android.material.slider.RangeSlider
+        android:id="@+id/durationRangeSlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stepSize="1"
+        android:valueFrom="3"
+        android:valueTo="30"
+        android:visibility="gone"
+        app:tickVisible="false" />
+
+    <!-- Randomize pause length toggle -->
+    <LinearLayout
+        android:id="@+id/randomizeRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:minHeight="56dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/randomize_length"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/randomizeSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:clickable="false"
+            android:focusable="false" />
+    </LinearLayout>
+
     <!-- Show countdown toggle -->
     <LinearLayout
         android:id="@+id/showTimerRow"

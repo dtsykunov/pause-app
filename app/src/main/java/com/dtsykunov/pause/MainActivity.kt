@@ -68,6 +68,27 @@ class MainActivity : AppCompatActivity() {
             Prefs.setPauseSeconds(this, seconds)
         }
 
+        val rangeMin = Prefs.durationMin(this)
+        val rangeMax = Prefs.durationMax(this)
+        binding.durationRangeSlider.values = listOf(rangeMin.toFloat(), rangeMax.toFloat())
+        binding.rangeLabel.text = getString(R.string.duration_range_value, rangeMin, rangeMax)
+        binding.durationRangeSlider.addOnChangeListener { slider, _, _ ->
+            val sorted = slider.values.sorted()
+            val lo = sorted.first().toInt()
+            val hi = sorted.last().toInt()
+            binding.rangeLabel.text = getString(R.string.duration_range_value, lo, hi)
+            Prefs.setDurationRange(this, lo, hi)
+        }
+
+        binding.randomizeSwitch.isChecked = Prefs.durationMode(this) == Prefs.MODE_RANDOM
+        applyDurationModeVisibility(binding.randomizeSwitch.isChecked)
+        binding.randomizeRow.setOnClickListener {
+            val random = !binding.randomizeSwitch.isChecked
+            binding.randomizeSwitch.isChecked = random
+            Prefs.setDurationMode(this, if (random) Prefs.MODE_RANDOM else Prefs.MODE_FIXED)
+            applyDurationModeVisibility(random)
+        }
+
         binding.showTimerSwitch.isChecked = Prefs.showTimer(this)
         binding.showTimerRow.setOnClickListener {
             val show = !binding.showTimerSwitch.isChecked
@@ -91,6 +112,13 @@ class MainActivity : AppCompatActivity() {
             binding.allowLabel.text = getString(R.string.allow_value, minutes)
             Prefs.setAllowMinutes(this, minutes)
         }
+    }
+
+    private fun applyDurationModeVisibility(random: Boolean) {
+        binding.durationLabel.visibility = if (random) View.GONE else View.VISIBLE
+        binding.durationSlider.visibility = if (random) View.GONE else View.VISIBLE
+        binding.rangeLabel.visibility = if (random) View.VISIBLE else View.GONE
+        binding.durationRangeSlider.visibility = if (random) View.VISIBLE else View.GONE
     }
 
     private fun showHint(titleRes: Int, bodyRes: Int) {

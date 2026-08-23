@@ -1,0 +1,1 @@
+Add an optional randomized pause length: set a min and max and get a different wait each time.

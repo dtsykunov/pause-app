@@ -40,6 +40,8 @@
     </plurals>
 
     <string name="duration_value">%1$d seconds</string>
+    <string name="duration_range_value">%1$d to %2$d seconds</string>
+    <string name="randomize_length">Randomize pause length</string>
     <string name="show_timer">Show countdown</string>
     <string name="phrase_hint">Shown during the pause</string>
     <string name="save">Save</string>
@@ -49,7 +51,7 @@
 
     <string name="help">Explain this option</string>
     <string name="got_it">Got it</string>
-    <string name="help_length_body">How long the pause screen stays before you can continue. The “Open anyway” button only appears once this time is up.</string>
+    <string name="help_length_body">How long the pause screen stays before you can continue. The “Open anyway” button only appears once this time is up. Turn on Randomize pause length to get a different length each time, picked between your min and max, instead of always the same length.</string>
     <string name="help_allow_body">After you tap “Open anyway”, Pause won\'t interrupt opening that app for this many minutes. Applies to that one app only. Pause never closes an app while you\'re using it.</string>
     <string name="loading">Loading apps…</string>
 

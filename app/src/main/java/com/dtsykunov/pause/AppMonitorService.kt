@@ -221,7 +221,7 @@ class AppMonitorService : AccessibilityService() {
         val lastOpenedAt = Prefs.lastOpenedAt(this, active)
         val attempts = Prefs.recordAttempt(this, active)
         Prefs.incInterruptions(this, active)
-        showOverlay(active, attempts, lastOpenedAt, Prefs.pauseSeconds(this), Prefs.phrase(this), Prefs.showTimer(this))
+        showOverlay(active, attempts, lastOpenedAt, Prefs.resolvePauseSeconds(this), Prefs.phrase(this), Prefs.showTimer(this))
     }
 
     /**
