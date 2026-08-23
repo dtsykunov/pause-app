@@ -55,14 +55,16 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 ## How it works
 
 - `AppMonitorService`: accessibility service; reacts to foreground-app changes and triggers the
-  overlay for paused apps. A configurable per-app allow-window (default 5 min) after "Open anyway"
-  avoids re-prompting that app during its session.
+  overlay for paused apps. A configurable per-app allow-window (default 15 min) after "Open anyway"
+  avoids re-prompting that app during its session. Optionally, the end of that window becomes a
+  check-in instead of a passive gate: the pause reappears if you're still in the app, and you
+  choose whether to continue or leave.
 - `InterventionOverlay`: the full-screen cover. It covers the screen immediately, eases in a pulsing
   circle and countdown, then reveals the choice buttons; it slides back down on dismiss.
 - `Prefs`: stores the paused-app set, pause length, the rolling 24h list of open attempts, and the
   per-app stats.
 - `MainActivity` / `AppsActivity` / `StatsActivity`: settings (accessibility status, pause length,
-  message, allow-window), the searchable app picker, and per-app stats.
+  message, allow-window and the check-in switch), the searchable app picker, and per-app stats.
 
 Note: an accessibility-based gate is best-effort, not a hard block. It's designed to make impulsive
 opens deliberate, not to be tamper-proof.

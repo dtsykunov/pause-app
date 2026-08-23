@@ -16,6 +16,7 @@ object Prefs {
     private const val KEY_PHRASE = "pause_phrase"
     private const val KEY_SHOW_TIMER = "show_timer"
     private const val KEY_ALLOW_MIN = "allow_minutes"
+    private const val KEY_PAUSE_AGAIN = "pause_again"
     private const val KEY_STAT_PKGS = "stat_packages"
     private const val STAT_INTERRUPTIONS = "si_"
     private const val STAT_OPENS = "so_"
@@ -118,6 +119,14 @@ object Prefs {
 
     fun setAllowMinutes(c: Context, minutes: Int) {
         sp(c).edit().putInt(KEY_ALLOW_MIN, minutes).apply()
+    }
+
+    /** When true, the end of an app's allow window shows the pause again, instead of only
+     *  mattering the next time that app is opened. Off keeps today's behavior exactly. */
+    fun pauseAgainWhenAllowEnds(c: Context): Boolean = sp(c).getBoolean(KEY_PAUSE_AGAIN, false)
+
+    fun setPauseAgainWhenAllowEnds(c: Context, on: Boolean) {
+        sp(c).edit().putBoolean(KEY_PAUSE_AGAIN, on).apply()
     }
 
     /** When [pkg] was last actually opened (via "Open anyway"), or null if never. */

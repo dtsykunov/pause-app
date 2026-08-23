@@ -48,11 +48,12 @@
     <string name="message_saved">Message saved</string>
     <string name="section_allow">After Open anyway</string>
     <string name="allow_value">Skip the pause for %1$d min</string>
+    <string name="pause_again">Pause again when time is up (experimental)</string>
 
     <string name="help">Explain this option</string>
     <string name="got_it">Got it</string>
     <string name="help_length_body">How long the pause screen stays before you can continue. The “Open anyway” button only appears once this time is up. Turn on Randomize pause length to get a different length each time, picked between your min and max, instead of always the same length.</string>
-    <string name="help_allow_body">After you tap “Open anyway”, Pause won\'t interrupt opening that app for this many minutes. Applies to that one app only. Pause never closes an app while you\'re using it.</string>
+    <string name="help_allow_body">After you tap “Open anyway”, Pause won\'t interrupt that app for this many minutes. Applies to that app only.\n\nOff: the pause returns only when you open the app again.\nOn: it also returns when the time runs out and you\'re still in the app.\n\nThe clock runs on real time, so leaving and coming back doesn\'t reset it.</string>
     <string name="loading">Loading apps…</string>
 
     <string name="overlay_opening">Opening %1$s</string>
@@ -63,6 +64,9 @@
     <string name="overlay_breathe">Take a moment</string>
     <string name="overlay_open">Open anyway</string>
     <string name="overlay_close">Cancel</string>
+    <string name="overlay_still_using">Still in %1$s</string>
+    <string name="overlay_continue">Continue</string>
+    <string name="overlay_leave">Leave</string>
 
     <string name="view_stats">Stats</string>
     <string name="stats_title">Stats</string>

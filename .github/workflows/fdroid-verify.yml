@@ -22,6 +22,9 @@ permissions:
 
 jobs:
   fdroid-verify:
+    # Prereleases (v0.5.0-beta.1 and friends) are branch test builds that never go to F-Droid,
+    # and `release: published` fires for them too. Skip them; manual runs are always allowed.
+    if: ${{ github.event_name == 'workflow_dispatch' || !github.event.release.prerelease }}
     runs-on: ubuntu-latest
     container:
       # F-Droid's build environment: Debian + Android SDK + Java + gradlew-fdroid.
