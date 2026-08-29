@@ -349,11 +349,17 @@ class AppMonitorService : AccessibilityService() {
             armExpiryCheck(pkg)
             return
         }
-        // Only interrupt when this app is genuinely the one in front. topApplicationPackage() is
-        // the strict test; isOnScreen() is deliberately looser — it stays true for an app sitting
-        // behind a dialog, which is right for keeping a session alive but wrong for deciding to
-        // cover the screen.
-        if (topApplicationPackage() != pkg || overlay?.isShowing == true || keyguard.isKeyguardLocked) {
+        // topApplicationPackage() is the preferred, strict test: is pkg the topmost real app
+        // window. Some devices (seen on Android 10) report a keyboard's own window ahead of the
+        // app's in the window list while it's open, which would fail this check for as long as
+        // the keyboard stays up — and with no further accessibility event guaranteed to arrive
+        // (sitting idle with the keyboard open produces none), nothing would ever re-check it.
+        // isOnScreen() is the fallback: looser — it also stays true behind a dialog — but it's
+        // the same test the rest of this file already trusts for "the app is still genuinely
+        // here", and occasionally showing over a stray window beats staying silent indefinitely.
+        val notShowable = overlay?.isShowing == true || keyguard.isKeyguardLocked ||
+            (topApplicationPackage() != pkg && !isOnScreen(pkg))
+        if (notShowable) {
             // Absorb a momentary blip (a mid-transition read, a dialog closing). Past that stop
             // polling: the window stays expired, so the checks in evaluateForeground show the
             // pause as soon as the user is genuinely back in the app.
