@@ -1,6 +1,7 @@
 package com.dtsykunov.pause
 
 import android.accessibilityservice.AccessibilityService
+import android.content.res.Configuration
 import android.graphics.PixelFormat
 import android.view.ContextThemeWrapper
 import android.os.CountDownTimer
@@ -12,6 +13,8 @@ import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.dtsykunov.pause.databinding.OverlayInterventionBinding
 import kotlin.math.ceil
 
@@ -59,17 +62,43 @@ class InterventionOverlay(
             } else false
         }
 
+        // An accessibility overlay window is clipped to the content frame by default, so
+        // without these flags the status/nav bar regions show whatever the paused app put
+        // there instead of our panel. Draw full-bleed, under translucent bars, so our own
+        // background is what's behind them.
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
             0,
             PixelFormat.TRANSLUCENT
-        ).apply { gravity = Gravity.TOP }
+        ).apply {
+            gravity = Gravity.TOP
+            flags = flags or
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS or
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
+        }
 
         wm.addView(binding.root, params)
         isShowing = true
         binding.root.requestFocus()
+
+        // Keep content clear of the status bar / nav bar / gesture inset areas now that the
+        // panel extends behind them.
+        ViewCompat.setOnApplyWindowInsetsListener(binding.scrollView) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(view.paddingLeft, bars.top, view.paddingRight, bars.bottom)
+            insets
+        }
+
+        val isLightMode = themedContext.resources.configuration.uiMode and
+            Configuration.UI_MODE_NIGHT_MASK != Configuration.UI_MODE_NIGHT_YES
+        ViewCompat.getWindowInsetsController(binding.root)?.apply {
+            isAppearanceLightStatusBars = isLightMode
+            isAppearanceLightNavigationBars = isLightMode
+        }
 
         // Cover the screen instantly so the app behind isn't briefly visible; ease the
         // content in rather than sliding the whole panel up.
