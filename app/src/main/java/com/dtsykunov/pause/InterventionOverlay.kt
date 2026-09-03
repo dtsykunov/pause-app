@@ -28,6 +28,7 @@ class InterventionOverlay(
     private val seconds: Int,
     private val phrase: String,
     private val showTimer: Boolean,
+    private val isReminder: Boolean = false,
     private val onOpenAnyway: () -> Unit,
     private val onClose: () -> Unit,
 ) {
@@ -81,9 +82,18 @@ class InterventionOverlay(
     }
 
     private fun bindTexts() {
-        binding.openingText.text =
-            binding.root.context.getString(R.string.overlay_opening, appLabel)
         val ctx = binding.root.context
+        // A check-in interrupts an app the user is already in, so "Opening X" / "Open anyway" /
+        // "Cancel" all misdescribe the choice, and there's no open attempt to count.
+        binding.openingText.text = ctx.getString(
+            if (isReminder) R.string.overlay_still_using else R.string.overlay_opening,
+            appLabel,
+        )
+        binding.openButton.text =
+            ctx.getString(if (isReminder) R.string.overlay_continue else R.string.overlay_open)
+        binding.closeButton.text =
+            ctx.getString(if (isReminder) R.string.overlay_leave else R.string.overlay_close)
+        binding.attemptsText.visibility = if (isReminder) View.GONE else View.VISIBLE
         val sinceLast = lastOpenedAt?.let { System.currentTimeMillis() - it }?.takeIf { it >= 0 }
         binding.attemptsText.text = when {
             sinceLast != null && attempts <= 1 ->

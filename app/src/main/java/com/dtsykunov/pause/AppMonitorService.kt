@@ -32,6 +32,11 @@ import androidx.core.content.ContextCompat
  * launcher (home/recents), a confirmed fullscreen replacement by another app, or a long screen
  * lock. Foreign windows riding on the session — share sheets, permission dialogs, sign-in
  * popups, invisible trampoline activities — and short locks don't count as reopening.
+ *
+ * Optionally (Prefs.pauseAgainWhenAllowEnds) the end of an app's allow window also becomes an
+ * active check-in rather than a passive gate: a timer fires at [allowedUntil] and shows the
+ * pause again if the user is still in that app. Deliberately keyed off that stored timestamp
+ * rather than the session heuristics above, so "why did it interrupt me now?" stays answerable.
  */
 class AppMonitorService : AccessibilityService() {
 
@@ -46,6 +51,12 @@ class AppMonitorService : AccessibilityService() {
 
     /** Per-app "skip the pause" deadlines, set after Open anyway or inherited from an allowed app. */
     private val allowedUntil = HashMap<String, Long>()
+
+    /** Pending "this app's allow window just ran out" check, for the app in front. At most one:
+     *  moving to another app simply replaces it. [allowedUntil] stays the source of truth, so a
+     *  runnable left pointing at an app the user has left is harmless — it sees the app isn't in
+     *  front and stops. Nothing needs cancelling on navigation, lock, or app switch. */
+    private var expiryRunnable: Runnable? = null
 
     private val handler = Handler(Looper.getMainLooper())
     private var pendingCheck: Runnable? = null
@@ -181,7 +192,15 @@ class AppMonitorService : AccessibilityService() {
         if (!Prefs.globalEnabled(this)) return
         val active = rootInActiveWindow?.packageName?.toString() ?: return
         if (isTransientWindow(active)) return // system UI, keyboard, our own overlay
-        if (active == currentApp) return      // same app: in-app nav, keyboard toggle, dialog, back
+        if (active == currentApp) {
+            // Same app: in-app nav, keyboard toggle, dialog, back. Nothing to re-evaluate about
+            // the foreground, but this is where events land while the user sits in an app — so
+            // it's also how an allow window that ran out behind a dialog, or during a lock, gets
+            // noticed once the user is really back (ACTION_SCREEN_ON re-runs this check too).
+            // isBlocked guards it because this sits above the blocked check below.
+            if (Prefs.isBlocked(this, active)) armExpiryCheck(active)
+            return
+        }
 
         // A focused foreign window over a still-visible paused app is a dialog, sheet, or
         // trampoline riding on the session, not a navigation: don't end the session, or the
@@ -216,7 +235,10 @@ class AppMonitorService : AccessibilityService() {
 
         val now = System.currentTimeMillis()
         // The allow-window is strictly per app: Open anyway only skips the pause for that app.
-        if (now < (allowedUntil[active] ?: 0L)) return
+        if (now < (allowedUntil[active] ?: 0L)) {
+            armExpiryCheck(active)
+            return
+        }
 
         val lastOpenedAt = Prefs.lastOpenedAt(this, active)
         val attempts = Prefs.recordAttempt(this, active)
@@ -291,6 +313,75 @@ class AppMonitorService : AccessibilityService() {
 
     private fun allowWindowMs(): Long = Prefs.allowMinutes(this) * 60_000L
 
+    /**
+     * Schedule the check-in for the end of [pkg]'s allow window, firing immediately if that has
+     * already passed. A no-op unless the setting is on, and unless [pkg] actually has a window —
+     * so this can never invent a deadline for an app the user was never let into.
+     *
+     * The deadline is wall-clock while the delay is uptime-based, which is self-correcting: if
+     * the device sleeps the timer fires late and the window already reads as expired; if it
+     * fires early the re-arm in [onAllowExpired] waits out the remainder. The timer is only a
+     * hint to look; [allowedUntil] decides.
+     */
+    private fun armExpiryCheck(pkg: String) {
+        cancelExpiryCheck()
+        if (!Prefs.pauseAgainWhenAllowEnds(this)) return
+        val dueAt = allowedUntil[pkg] ?: return
+        val check = Runnable { onAllowExpired(pkg, confirmRetries) }
+        expiryRunnable = check
+        handler.postDelayed(check, (dueAt - System.currentTimeMillis()).coerceAtLeast(0))
+    }
+
+    private fun cancelExpiryCheck() {
+        expiryRunnable?.let { handler.removeCallbacks(it) }
+        expiryRunnable = null
+    }
+
+    /** [pkg]'s allow window has run out: show the pause again if the user is still in that app. */
+    private fun onAllowExpired(pkg: String, retriesLeft: Int) {
+        expiryRunnable = null
+        if (!Prefs.pauseAgainWhenAllowEnds(this) || !Prefs.globalEnabled(this)) return
+        // The app can have been un-paused since this was armed: nothing clears allowedUntil, and
+        // un-pausing doesn't cancel a pending check.
+        if (!Prefs.isBlocked(this, pkg)) return
+        // A newer allow window may have been granted since this was armed; wait for the real one.
+        if (System.currentTimeMillis() < (allowedUntil[pkg] ?: 0L)) {
+            armExpiryCheck(pkg)
+            return
+        }
+        // topApplicationPackage() is the preferred, strict test: is pkg the topmost real app
+        // window. Some devices (seen on Android 10) report a keyboard's own window ahead of the
+        // app's in the window list while it's open, which would fail this check for as long as
+        // the keyboard stays up — and with no further accessibility event guaranteed to arrive
+        // (sitting idle with the keyboard open produces none), nothing would ever re-check it.
+        // isOnScreen() is the fallback: looser — it also stays true behind a dialog — but it's
+        // the same test the rest of this file already trusts for "the app is still genuinely
+        // here", and occasionally showing over a stray window beats staying silent indefinitely.
+        val notShowable = overlay?.isShowing == true || keyguard.isKeyguardLocked ||
+            (topApplicationPackage() != pkg && !isOnScreen(pkg))
+        if (notShowable) {
+            // Absorb a momentary blip (a mid-transition read, a dialog closing). Past that stop
+            // polling: the window stays expired, so the checks in evaluateForeground show the
+            // pause as soon as the user is genuinely back in the app.
+            if (retriesLeft > 0) {
+                val retry = Runnable { onAllowExpired(pkg, retriesLeft - 1) }
+                expiryRunnable = retry
+                handler.postDelayed(retry, settleDelayMs)
+            }
+            return
+        }
+        Prefs.incInterruptions(this, pkg)
+        showOverlay(
+            pkg,
+            attempts = 0,
+            lastOpenedAt = null,
+            seconds = Prefs.resolvePauseSeconds(this),
+            phrase = Prefs.phrase(this),
+            showTimer = Prefs.showTimer(this),
+            isReminder = true,
+        )
+    }
+
     private fun isTransientWindow(pkg: String): Boolean =
         pkg == packageName ||
             pkg == "com.android.systemui" ||
@@ -317,7 +408,17 @@ class AppMonitorService : AccessibilityService() {
         } == true
     }
 
-    private fun showOverlay(pkg: String, attempts: Int, lastOpenedAt: Long?, seconds: Int, phrase: String, showTimer: Boolean) {
+    private fun showOverlay(
+        pkg: String,
+        attempts: Int,
+        lastOpenedAt: Long?,
+        seconds: Int,
+        phrase: String,
+        showTimer: Boolean,
+        isReminder: Boolean = false,
+    ) {
+        // No expiry check should run underneath a pause that's already up.
+        cancelExpiryCheck()
         val shownAt = SystemClock.elapsedRealtime()
         overlay = InterventionOverlay(
             service = this,
@@ -327,10 +428,13 @@ class AppMonitorService : AccessibilityService() {
             seconds = seconds,
             phrase = phrase,
             showTimer = showTimer,
+            isReminder = isReminder,
             onOpenAnyway = {
                 Prefs.incOpens(this, pkg)
                 recordBreathing(pkg, shownAt, seconds)
                 allowedUntil[pkg] = System.currentTimeMillis() + allowWindowMs()
+                // The fresh window's end is the next check-in, which is what makes it repeat.
+                armExpiryCheck(pkg)
                 overlay = null
             },
             onClose = {
@@ -385,12 +489,15 @@ class AppMonitorService : AccessibilityService() {
 
     override fun onUnbind(intent: Intent?): Boolean {
         cancelPending()
+        cancelExpiryCheck()
         overlay?.dismissNow()
         overlay = null
         return super.onUnbind(intent)
     }
 
     override fun onDestroy() {
+        cancelPending()
+        cancelExpiryCheck()
         if (receiverRegistered) {
             receiverRegistered = false
             unregisterReceiver(powerReceiver)

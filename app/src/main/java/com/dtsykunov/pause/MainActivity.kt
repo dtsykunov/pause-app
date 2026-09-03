@@ -112,6 +112,13 @@ class MainActivity : AppCompatActivity() {
             binding.allowLabel.text = getString(R.string.allow_value, minutes)
             Prefs.setAllowMinutes(this, minutes)
         }
+
+        binding.pauseAgainSwitch.isChecked = Prefs.pauseAgainWhenAllowEnds(this)
+        binding.pauseAgainRow.setOnClickListener {
+            val on = !binding.pauseAgainSwitch.isChecked
+            binding.pauseAgainSwitch.isChecked = on
+            Prefs.setPauseAgainWhenAllowEnds(this, on)
+        }
     }
 
     private fun applyDurationModeVisibility(random: Boolean) {

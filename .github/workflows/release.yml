@@ -58,5 +58,8 @@ jobs:
           files: pause-*.apk
           name: Pause ${{ github.ref_name }}
           generate_release_notes: true
+          # Semver: a hyphen means prerelease (v0.5.0-beta.1). Those stay off the "Latest"
+          # badge and /releases/latest, so a test build from a branch never looks stable.
+          prerelease: ${{ contains(github.ref_name, '-') }}
           body: |
             Pause is a free, open-source Android app that adds a short, timed pause before you open distracting apps.
