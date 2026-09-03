@@ -29,7 +29,7 @@ object Prefs {
 
     const val DEFAULT_DURATION = 10
     const val MIN_DURATION = 3
-    const val MAX_DURATION = 30
+    const val MAX_DURATION = 60
     const val MODE_FIXED = "fixed"
     const val MODE_RANDOM = "random"
     const val DEFAULT_DURATION_MIN = 5
