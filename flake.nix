@@ -16,10 +16,12 @@
 
         androidSdk = (pkgs.androidenv.composeAndroidPackages {
           buildToolsVersions = [ "35.0.0" "34.0.0" "29.0.3" ];
-          platformVersions = [ "34" ];
-          includeEmulator = false;
+          platformVersions = [ "34" "29" ];
+          includeEmulator = true;
           includeNDK = false;
-          includeSystemImages = false;
+          includeSystemImages = true;
+          systemImageTypes = [ "google_apis" ];
+          abiVersions = [ "x86_64" ];
           includeSources = false;
         }).androidsdk;
       in
@@ -32,8 +34,8 @@
         GRADLE_OPTS = "-Dorg.gradle.daemon=false";
 
         shellHook = ''
-          export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/35.0.0:$PATH"
-          echo "Android dev env ready  (JDK 21 + SDK 34)"
+          export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/35.0.0:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+          echo "Android dev env ready  (JDK 21 + SDK 34, API 29 emulator image)"
         '';
       };
   };
